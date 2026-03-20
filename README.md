@@ -65,6 +65,18 @@ npm install --save-dev mcp-woodpecker
 npm run dev
 ```
 
+### Using with npx (No Installation)
+
+Run the server directly without installing it globally:
+
+```bash
+export WOODPECKER_URL=https://woodpecker.devpuccino.com/
+export WOODPECKER_API_KEY=your_api_token_here
+npx mcp-woodpecker
+```
+
+This is useful for testing, CI/CD pipelines, or ephemeral environments.
+
 ### Using with Claude AI
 
 Add to your `.claude/config.json`:
