@@ -1,0 +1,191 @@
+steps:
+  build-test:
+    image: node:20-alpine
+    when:
+      event: manual
+    commands:
+      - npm ci
+      - npm run build
+      - npm test || true
+
+  build-development:
+    image: node:20-alpine
+    when:
+      branch: develop
+      event: push
+    commands:
+      - npm ci
+      - npm run build
+      - npm test || true
+
+  build-production:
+    image: node:20-alpine
+    when:
+      event: tag
+      ref: refs/tags/v*
+    commands:
+      - npm ci
+      - npm run build
+      - npm test
+
+  docker-build-test:
+    image: docker:dind
+    privileged: true
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    when:
+      event: manual
+    environment:
+      REGISTRY_USERNAME:
+        from_secret: REGISTRY_USERNAME
+      REGISTRY_PASSWORD:
+        from_secret: REGISTRY_PASSWORD
+    commands:
+      - echo "$REGISTRY_PASSWORD" | docker login 192.168.0.200:30095 -u "$REGISTRY_USERNAME" --password-stdin
+      - |
+        docker build -t 192.168.0.200:30095/mcp-woodpecker:test .
+      - docker push 192.168.0.200:30095/mcp-woodpecker:test
+      - docker builder prune -f
+      - docker image prune -f
+
+  docker-build-development:
+    image: docker:dind
+    privileged: true
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    when:
+      branch: develop
+      event: push
+    environment:
+      REGISTRY_USERNAME:
+        from_secret: REGISTRY_USERNAME
+      REGISTRY_PASSWORD:
+        from_secret: REGISTRY_PASSWORD
+    commands:
+      - echo "$REGISTRY_PASSWORD" | docker login 192.168.0.200:30095 -u "$REGISTRY_USERNAME" --password-stdin
+      - |
+        docker build -t 192.168.0.200:30095/mcp-woodpecker:dev .
+      - docker push 192.168.0.200:30095/mcp-woodpecker:dev
+      - docker builder prune -f
+      - docker image prune -f
+
+  docker-build-production:
+    image: docker:dind
+    privileged: true
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    when:
+      event: tag
+      ref: refs/tags/v*
+    environment:
+      REGISTRY_USERNAME:
+        from_secret: REGISTRY_USERNAME
+      REGISTRY_PASSWORD:
+        from_secret: REGISTRY_PASSWORD
+    commands:
+      - echo "$REGISTRY_PASSWORD" | docker login 192.168.0.200:30095 -u "$REGISTRY_USERNAME" --password-stdin
+      - |
+        docker build \
+          -t 192.168.0.200:30095/mcp-woodpecker:${CI_COMMIT_TAG} \
+          -t 192.168.0.200:30095/mcp-woodpecker:latest .
+      - docker push 192.168.0.200:30095/mcp-woodpecker:${CI_COMMIT_TAG}
+      - docker push 192.168.0.200:30095/mcp-woodpecker:latest
+      - docker builder prune -f
+      - docker image prune -f
+
+  npm-publish:
+    image: node:20-alpine
+    when:
+      event: tag
+      ref: refs/tags/v*
+    secrets:
+      - npm_token
+    commands:
+      - npm ci
+      - npm run build
+      - echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc
+      - npm publish
+
+  deploy-test:
+    image: docker:dind
+    privileged: true
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    when:
+      event: manual
+    environment:
+      REGISTRY_USERNAME:
+        from_secret: REGISTRY_USERNAME
+      REGISTRY_PASSWORD:
+        from_secret: REGISTRY_PASSWORD
+      WOODPECKER_URL:
+        from_secret: WOODPECKER_URL_TEST
+      WOODPECKER_API_KEY:
+        from_secret: WOODPECKER_API_KEY_TEST
+    depends_on:
+      - docker-build-test
+    commands:
+      - echo "$REGISTRY_PASSWORD" | docker login 192.168.0.200:30095 -u "$REGISTRY_USERNAME" --password-stdin
+      - |
+        docker run -d \
+          --name mcp-woodpecker-test \
+          -e WOODPECKER_URL=${WOODPECKER_URL} \
+          -e WOODPECKER_API_KEY=${WOODPECKER_API_KEY} \
+          192.168.0.200:30095/mcp-woodpecker:test
+
+  deploy-development:
+    image: docker:dind
+    privileged: true
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    when:
+      branch: develop
+      event: push
+    environment:
+      REGISTRY_USERNAME:
+        from_secret: REGISTRY_USERNAME
+      REGISTRY_PASSWORD:
+        from_secret: REGISTRY_PASSWORD
+      WOODPECKER_URL:
+        from_secret: WOODPECKER_URL_DEV
+      WOODPECKER_API_KEY:
+        from_secret: WOODPECKER_API_KEY_DEV
+    depends_on:
+      - docker-build-development
+    commands:
+      - echo "$REGISTRY_PASSWORD" | docker login 192.168.0.200:30095 -u "$REGISTRY_USERNAME" --password-stdin
+      - |
+        docker run -d \
+          --name mcp-woodpecker-dev \
+          -e WOODPECKER_URL=${WOODPECKER_URL} \
+          -e WOODPECKER_API_KEY=${WOODPECKER_API_KEY} \
+          192.168.0.200:30095/mcp-woodpecker:dev
+
+  deploy-production:
+    image: docker:dind
+    privileged: true
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    when:
+      event: tag
+      ref: refs/tags/v*
+    environment:
+      REGISTRY_USERNAME:
+        from_secret: REGISTRY_USERNAME
+      REGISTRY_PASSWORD:
+        from_secret: REGISTRY_PASSWORD
+      WOODPECKER_URL:
+        from_secret: WOODPECKER_URL
+      WOODPECKER_API_KEY:
+        from_secret: WOODPECKER_API_KEY
+    depends_on:
+      - docker-build-production
+      - npm-publish
+    commands:
+      - echo "$REGISTRY_PASSWORD" | docker login 192.168.0.200:30095 -u "$REGISTRY_USERNAME" --password-stdin
+      - |
+        docker run -d \
+          --name mcp-woodpecker \
+          -e WOODPECKER_URL=${WOODPECKER_URL} \
+          -e WOODPECKER_API_KEY=${WOODPECKER_API_KEY} \
+          192.168.0.200:30095/mcp-woodpecker:latest
