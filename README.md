@@ -1,55 +1,86 @@
 # MCP Woodpecker Server
 
-A comprehensive MCP (Model Context Protocol) server for interacting with Woodpecker CI. This server provides tools to manage repositories, pipelines, secrets, registries, crons, and organization settings.
+[![npm version](https://badge.fury.io/js/mcp-woodpecker.svg)](https://www.npmjs.com/package/mcp-woodpecker)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Node.js Version](https://img.shields.io/badge/node-%3E%3D18.0.0-brightgreen.svg)](https://nodejs.org/)
 
-## Features
+A comprehensive [Model Context Protocol (MCP)](https://modelcontextprotocol.io) server for seamlessly integrating [Woodpecker CI](https://woodpecker-ci.org) with AI-powered tools. This server provides 40+ tools to manage repositories, pipelines, secrets, registries, crons, and organization settings programmatically.
 
-- **Repository Management**: List, get, activate, update, and delete repositories
-- **Pipeline Management**: Trigger, cancel, and monitor pipelines with detailed logs
-- **Secrets Management**: Create and manage repository and organization-level secrets
-- **Registry Configuration**: Manage Docker registry credentials
-- **Cron Jobs**: Schedule and manage automated pipeline executions
-- **User & Server Info**: Get current user and server information
+Perfect for automating CI/CD workflows, integrating with Claude AI, or building custom Woodpecker management tools.
 
-## Prerequisites
+## ✨ Features
 
-- Node.js 18 or higher
-- A Woodpecker CI instance running
-- Woodpecker API token
+- **Repository Management** - List, get, activate, update, and delete repositories
+- **Pipeline Management** - Trigger, cancel, monitor pipelines with detailed logs and status
+- **Secrets Management** - Create and manage repository and organization-level secrets securely
+- **Registry Configuration** - Manage Docker registry credentials for authenticated builds
+- **Cron Jobs** - Schedule and manage automated pipeline executions with flexible expressions
+- **User & Server Info** - Get authenticated user details and server information
+- **Full Type Safety** - Built with TypeScript for reliable development
 
-## Setup
+## 🚀 Quick Start
 
-### 1. Install Dependencies
+### Installation
 
 ```bash
-npm install
+npm install -g mcp-woodpecker
 ```
 
-### 2. Configure Environment Variables
+Or as a project dependency:
 
-Set the following environment variables:
+```bash
+npm install mcp-woodpecker
+```
+
+### Prerequisites
+
+- **Node.js** 18.0.0 or higher
+- **Woodpecker CI** instance running and accessible
+- **API Token** from your Woodpecker instance (Personal Access Token)
+
+### Basic Setup
+
+1. **Get your Woodpecker API token:**
+   - Navigate to your Woodpecker instance (e.g., https://woodpecker.devpuccino.com/)
+   - Go to Settings → Personal Access Tokens
+   - Create a new token with appropriate permissions
+
+2. **Set environment variables:**
 
 ```bash
 export WOODPECKER_URL=https://woodpecker.devpuccino.com/
 export WOODPECKER_API_KEY=your_api_token_here
 ```
 
-### 3. Build the Project
+3. **Run the MCP server:**
 
 ```bash
-npm run build
+mcp-woodpecker
 ```
 
-### 4. Run the Server
+Or in development mode with hot reload:
 
 ```bash
-npm start
-```
-
-Or for development with hot reload:
-
-```bash
+npm install --save-dev mcp-woodpecker
 npm run dev
+```
+
+### Using with Claude AI
+
+Add to your `.claude/config.json`:
+
+```json
+{
+  "servers": {
+    "woodpecker": {
+      "command": "mcp-woodpecker",
+      "env": {
+        "WOODPECKER_URL": "https://woodpecker.devpuccino.com/",
+        "WOODPECKER_API_KEY": "your_api_token"
+      }
+    }
+  }
+}
 ```
 
 ## Environment Variables
@@ -166,39 +197,165 @@ master        → production (stable releases)
 v*            → npm + docker registry (tagged releases)
 ```
 
-## Docker Usage
+## 🐳 Docker Usage
 
-### Build
+### Build Docker Image
 
 ```bash
 docker build -t mcp-woodpecker:latest .
 ```
 
-### Run
+### Run in Docker
 
 ```bash
-docker run -e WOODPECKER_URL=https://example.com \
-           -e WOODPECKER_API_KEY=token \
-           mcp-woodpecker:latest
+docker run -d \
+  -e WOODPECKER_URL=https://woodpecker.example.com \
+  -e WOODPECKER_API_KEY=your_token \
+  --name mcp-woodpecker \
+  mcp-woodpecker:latest
 ```
 
-## Development
+### Docker Compose
+
+```yaml
+version: '3.8'
+services:
+  mcp-woodpecker:
+    build: .
+    environment:
+      WOODPECKER_URL: https://woodpecker.example.com
+      WOODPECKER_API_KEY: ${WOODPECKER_API_KEY}
+    restart: unless-stopped
+```
+
+## 🛠️ Development Guide
+
+### Local Development Setup
+
+1. **Clone and install:**
+
+```bash
+git clone https://github.com/berryj85/mcp-woodpecker.git
+cd mcp-woodpecker
+npm install
+```
+
+2. **Configure environment:**
+
+```bash
+cp .env.example .env
+# Edit .env with your Woodpecker credentials
+```
+
+3. **Start development server:**
+
+```bash
+npm run dev
+```
 
 ### Project Structure
 
 ```
-src/
-├── index.ts              # Main MCP server
-└── woodpecker-client.ts  # API client wrapper
+mcp-woodpecker/
+├── src/
+│   ├── index.ts              # Main MCP server with all tool definitions
+│   └── woodpecker-client.ts  # Woodpecker API client wrapper
+├── dist/                     # Compiled JavaScript output
+├── .woodpecker.yml          # CI/CD pipeline configuration
+├── Dockerfile               # Container configuration
+├── package.json             # Project metadata and dependencies
+├── tsconfig.json            # TypeScript configuration
+├── .env.example             # Environment variables template
+└── README.md                # This file
+```
+
+### Available npm Scripts
+
+| Script | Description |
+|--------|-------------|
+| `npm run build` | Compile TypeScript to JavaScript |
+| `npm run dev` | Start development server with hot reload |
+| `npm start` | Start production server |
+| `npm test` | Run tests (when available) |
+
+### Building from Source
+
+```bash
+# Install dependencies
+npm install
+
+# Compile TypeScript
+npm run build
+
+# Output is in the dist/ directory
+ls -la dist/
 ```
 
 ### Debugging
 
-Set the `DEBUG` environment variable for verbose logging:
+Enable debug logging with:
 
 ```bash
 DEBUG=* npm run dev
 ```
+
+For more verbose output:
+
+```bash
+NODE_DEBUG=* npm run dev
+```
+
+### Adding New Tools
+
+1. **Add API method** to `src/woodpecker-client.ts`:
+
+```typescript
+async myNewMethod(param: string): Promise<unknown> {
+  return this.request('POST', `/my/endpoint/${param}`, {});
+}
+```
+
+2. **Define tool schema** in `src/index.ts`:
+
+```typescript
+{
+  name: 'my_tool',
+  description: 'My tool description',
+  inputSchema: {
+    type: 'object',
+    properties: {
+      param: { type: 'string', description: 'Parameter' }
+    },
+    required: ['param']
+  }
+}
+```
+
+3. **Implement tool handler**:
+
+```typescript
+else if (toolName === 'my_tool') {
+  result = await client.myNewMethod(toolInput.param as string);
+}
+```
+
+### Testing Tools Locally
+
+```bash
+# Start the server
+npm run dev
+
+# In another terminal, test a tool
+curl -X POST http://localhost:3000/tools/list_repositories
+```
+
+### Code Style and Formatting
+
+The project uses TypeScript strict mode. Ensure:
+- All types are properly defined
+- No implicit `any` types
+- Functions have return type annotations
+- Error handling is comprehensive
 
 ## API Integration Example
 
@@ -240,12 +397,118 @@ await client.createSecret('owner', 'repo', {
 - Check network connectivity to the instance
 - Ensure the URL is correct (with/without trailing slash)
 
-## License
+## 📝 Publishing to npm
 
-See LICENSE file for details.
+This package is published to npm as [@devpuccino/mcp-woodpecker](https://www.npmjs.com/package/mcp-woodpecker).
 
-## Resources
+### Version Management
 
-- [Woodpecker CI Documentation](https://woodpecker-ci.org)
-- [MCP Specification](https://modelcontextprotocol.io)
-- [Woodpecker API Reference](https://woodpecker-ci.org/api)
+Versions follow [Semantic Versioning](https://semver.org/):
+- **MAJOR**: Breaking API changes
+- **MINOR**: New features (backward compatible)
+- **PATCH**: Bug fixes and patches
+
+### Release Process
+
+1. **Update version in package.json:**
+
+```bash
+npm version major|minor|patch
+```
+
+2. **Push changes:**
+
+```bash
+git push origin master --tags
+```
+
+3. **Publish to npm:**
+
+```bash
+npm publish
+```
+
+The Woodpecker CI pipeline automatically publishes to npm on version tags.
+
+## 🤝 Contributing
+
+Contributions are welcome! Please:
+
+1. **Fork the repository**
+2. **Create a feature branch:**
+
+```bash
+git checkout -b feature/my-feature
+```
+
+3. **Make your changes** and follow the code style
+4. **Commit with clear messages:**
+
+```bash
+git commit -m "feat: add my new feature"
+```
+
+5. **Push and create a Pull Request:**
+
+```bash
+git push origin feature/my-feature
+```
+
+### Development Workflow
+
+- **feature/** branches → `develop` (testing)
+- **develop** → `master` (production)
+- **v*** tags → npm registry & docker
+
+### Code Quality
+
+- Use TypeScript with strict mode
+- Keep functions focused and testable
+- Add JSDoc comments for public APIs
+- Handle errors gracefully
+
+## 🐛 Troubleshooting
+
+### Authentication Error
+```
+Error: Woodpecker API error: 401 Unauthorized
+```
+- Verify `WOODPECKER_API_KEY` is correct
+- Check token hasn't expired
+- Ensure user has API access permissions
+
+### Connection Refused
+```
+Error: connect ECONNREFUSED
+```
+- Verify `WOODPECKER_URL` is accessible
+- Check network connectivity
+- Ensure Woodpecker instance is running
+
+### Module Not Found
+```
+Error: Cannot find module '@modelcontextprotocol/sdk'
+```
+- Run `npm install` to install dependencies
+- Clear npm cache: `npm cache clean --force`
+- Delete node_modules and reinstall: `rm -rf node_modules && npm install`
+
+## 📄 License
+
+MIT License © 2026 BerryJ
+
+See [LICENSE](LICENSE) file for details.
+
+## 🔗 Resources
+
+- **[Woodpecker CI Documentation](https://woodpecker-ci.org)** - Official Woodpecker documentation
+- **[MCP Specification](https://modelcontextprotocol.io)** - Model Context Protocol details
+- **[Woodpecker API Reference](https://woodpecker-ci.org/api)** - REST API documentation
+- **[npm Package](https://www.npmjs.com/package/mcp-woodpecker)** - npm registry entry
+- **[GitHub Repository](https://github.com/berryj85/mcp-woodpecker)** - Source code
+
+## 🙋 Support
+
+- **Issues:** [GitHub Issues](https://github.com/berryj85/mcp-woodpecker/issues)
+- **Discussions:** [GitHub Discussions](https://github.com/berryj85/mcp-woodpecker/discussions)
+- **npm Profile:** [@devpuccino](https://www.npmjs.com/~devpuccino)
