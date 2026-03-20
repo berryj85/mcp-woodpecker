@@ -47,10 +47,12 @@ mcp-woodpecker/
 
 | Script | Description |
 |--------|-------------|
-| `npm run build` | Compile TypeScript to JavaScript |
+| `npm run build` | Compile TypeScript to JavaScript and make executable |
 | `npm run dev` | Start development server with hot reload |
 | `npm start` | Start production server |
-| `npm test` | Run tests (when available) |
+| `npm test` | Run all unit tests |
+| `npm run test:watch` | Run tests in watch mode (rerun on file changes) |
+| `npm run test:coverage` | Run tests and generate coverage report |
 
 ### Building from Source
 
@@ -115,6 +117,31 @@ else if (toolName === 'my_tool') {
 }
 ```
 
+### Running Unit Tests
+
+The project includes comprehensive unit tests with Jest and ts-jest.
+
+**Run all tests:**
+```bash
+npm test
+```
+
+**Run tests in watch mode (rerun on file changes):**
+```bash
+npm run test:watch
+```
+
+**Generate coverage report:**
+```bash
+npm run test:coverage
+```
+
+Coverage requirements:
+- **Statements**: 80%
+- **Branches**: 70%
+- **Functions**: 80%
+- **Lines**: 80%
+
 ### Testing Tools Locally
 
 ```bash
@@ -123,6 +150,36 @@ npm run dev
 
 # In another terminal, test a tool
 curl -X POST http://localhost:3000/tools/list_repositories
+```
+
+### Writing Tests
+
+Tests use Jest with mocked `fetch` for API calls. Key patterns:
+
+1. **Mock API responses:**
+```typescript
+mockFetch.mockResolvedValueOnce({
+  ok: true,
+  json: () => Promise.resolve({ /* response data */ }),
+});
+```
+
+2. **Test error handling:**
+```typescript
+mockFetch.mockResolvedValueOnce({
+  ok: false,
+  status: 401,
+  statusText: 'Unauthorized',
+  text: () => Promise.resolve('Error message'),
+});
+```
+
+3. **Verify API calls:**
+```typescript
+expect(mockFetch).toHaveBeenCalledWith(
+  'expected/url',
+  expect.objectContaining({ method: 'GET' })
+);
 ```
 
 ## 📝 Code Quality Standards

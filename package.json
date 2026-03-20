@@ -1,5 +1,5 @@
 {
-  "name": "mcp-woodpecker",
+  "name": "@devpuccino/mcp-woodpecker",
   "version": "1.0.0",
   "description": "Model Context Protocol (MCP) server for Woodpecker CI with comprehensive API tool support for pipeline management, secrets, registries, and more",
   "main": "dist/index.js",
@@ -13,9 +13,12 @@
     "mcp-woodpecker": "dist/index.js"
   },
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && chmod 755 dist/index.js",
     "dev": "tsx src/index.ts",
     "start": "node dist/index.js",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
     "prepublishOnly": "npm run build"
   },
   "keywords": [
@@ -42,12 +45,15 @@
     "url": "https://github.com/berryj85/mcp-woodpecker/issues"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^0.9.0"
+    "@modelcontextprotocol/sdk": "^1.27.1"
   },
   "devDependencies": {
+    "@types/jest": "^30.0.0",
     "@types/node": "^20.0.0",
-    "typescript": "^5.0.0",
-    "tsx": "^4.0.0"
+    "jest": "^30.3.0",
+    "ts-jest": "^29.4.6",
+    "tsx": "^4.0.0",
+    "typescript": "^5.0.0"
   },
   "engines": {
     "node": ">=18.0.0"
