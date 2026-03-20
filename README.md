@@ -240,175 +240,6 @@ services:
     restart: unless-stopped
 ```
 
-## 🛠️ Development Guide
-
-### Local Development Setup
-
-1. **Clone and install:**
-
-```bash
-git clone https://github.com/berryj85/mcp-woodpecker.git
-cd mcp-woodpecker
-npm install
-```
-
-2. **Configure environment:**
-
-```bash
-cp .env.example .env
-# Edit .env with your Woodpecker credentials
-```
-
-3. **Start development server:**
-
-```bash
-npm run dev
-```
-
-### Project Structure
-
-```
-mcp-woodpecker/
-├── src/
-│   ├── index.ts              # Main MCP server with all tool definitions
-│   └── woodpecker-client.ts  # Woodpecker API client wrapper
-├── dist/                     # Compiled JavaScript output
-├── .woodpecker.yml          # CI/CD pipeline configuration
-├── Dockerfile               # Container configuration
-├── package.json             # Project metadata and dependencies
-├── tsconfig.json            # TypeScript configuration
-├── .env.example             # Environment variables template
-└── README.md                # This file
-```
-
-### Available npm Scripts
-
-| Script | Description |
-|--------|-------------|
-| `npm run build` | Compile TypeScript to JavaScript |
-| `npm run dev` | Start development server with hot reload |
-| `npm start` | Start production server |
-| `npm test` | Run tests (when available) |
-
-### Building from Source
-
-```bash
-# Install dependencies
-npm install
-
-# Compile TypeScript
-npm run build
-
-# Output is in the dist/ directory
-ls -la dist/
-```
-
-### Debugging
-
-Enable debug logging with:
-
-```bash
-DEBUG=* npm run dev
-```
-
-For more verbose output:
-
-```bash
-NODE_DEBUG=* npm run dev
-```
-
-### Adding New Tools
-
-1. **Add API method** to `src/woodpecker-client.ts`:
-
-```typescript
-async myNewMethod(param: string): Promise<unknown> {
-  return this.request('POST', `/my/endpoint/${param}`, {});
-}
-```
-
-2. **Define tool schema** in `src/index.ts`:
-
-```typescript
-{
-  name: 'my_tool',
-  description: 'My tool description',
-  inputSchema: {
-    type: 'object',
-    properties: {
-      param: { type: 'string', description: 'Parameter' }
-    },
-    required: ['param']
-  }
-}
-```
-
-3. **Implement tool handler**:
-
-```typescript
-else if (toolName === 'my_tool') {
-  result = await client.myNewMethod(toolInput.param as string);
-}
-```
-
-### Testing Tools Locally
-
-```bash
-# Start the server
-npm run dev
-
-# In another terminal, test a tool
-curl -X POST http://localhost:3000/tools/list_repositories
-```
-
-### Code Style and Formatting
-
-The project uses TypeScript strict mode. Ensure:
-- All types are properly defined
-- No implicit `any` types
-- Functions have return type annotations
-- Error handling is comprehensive
-
-## API Integration Example
-
-```typescript
-import { WoodpeckerClient } from './src/woodpecker-client';
-
-const client = new WoodpeckerClient({
-  baseUrl: 'https://woodpecker.example.com',
-  token: 'your_token'
-});
-
-// List repositories
-const repos = await client.listRepositories();
-
-// Get specific pipeline
-const pipeline = await client.getPipeline('owner', 'repo', 1);
-
-// Create a secret
-await client.createSecret('owner', 'repo', {
-  name: 'API_KEY',
-  value: 'secret_value',
-  events: ['push']
-});
-```
-
-## Troubleshooting
-
-### Authentication Error
-- Verify `WOODPECKER_API_KEY` is set correctly
-- Ensure the token hasn't expired
-- Check that the user has appropriate permissions
-
-### API Endpoint Not Found
-- Confirm the Woodpecker version supports the endpoint
-- Check the `WOODPECKER_URL` is correct and accessible
-
-### Connection Refused
-- Verify the Woodpecker instance is running
-- Check network connectivity to the instance
-- Ensure the URL is correct (with/without trailing slash)
-
 ## 📝 Publishing to npm
 
 This package is published to npm as [@devpuccino/mcp-woodpecker](https://www.npmjs.com/package/mcp-woodpecker).
@@ -444,40 +275,15 @@ The Woodpecker CI pipeline automatically publishes to npm on version tags.
 
 ## 🤝 Contributing
 
-Contributions are welcome! Please:
+Contributions are welcome! See [CONTRIBUTE.md](CONTRIBUTE.md) for detailed guidelines on:
 
-1. **Fork the repository**
-2. **Create a feature branch:**
+- Setting up your development environment
+- Adding new tools to the MCP server
+- Code quality standards
+- Pull request process
+- Commit message conventions
 
-```bash
-git checkout -b feature/my-feature
-```
-
-3. **Make your changes** and follow the code style
-4. **Commit with clear messages:**
-
-```bash
-git commit -m "feat: add my new feature"
-```
-
-5. **Push and create a Pull Request:**
-
-```bash
-git push origin feature/my-feature
-```
-
-### Development Workflow
-
-- **feature/** branches → `develop` (testing)
-- **develop** → `master` (production)
-- **v*** tags → npm registry & docker
-
-### Code Quality
-
-- Use TypeScript with strict mode
-- Keep functions focused and testable
-- Add JSDoc comments for public APIs
-- Handle errors gracefully
+For bug reports and feature requests, please open an [issue](https://github.com/berryj85/mcp-woodpecker/issues).
 
 ## 🐛 Troubleshooting
 
