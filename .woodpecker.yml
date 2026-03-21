@@ -33,12 +33,13 @@ steps:
     image: node:20-alpine
     when:
       branch: master
-      event: tag
+      event: manual
       ref: refs/tags/v*
     environment:
       NPM_TOKEN:
         from_secret: NPM_TOKEN
     commands:
+      - echo "Token exists: ${NPM_TOKEN:+yes}"z
       - npm ci
       - npm run build
       - echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc
