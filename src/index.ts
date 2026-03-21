@@ -628,6 +628,11 @@ const tools: Tool[] = [
           type: 'string',
           description: 'Secret value',
         },
+        events: {
+          type: 'array',
+          items: { type: 'string' },
+          description: 'Events that trigger this secret (push, pull_request, tag, deployment, cron)',
+        },
       },
       required: ['orgId', 'name', 'value'],
     },
@@ -858,6 +863,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       result = await client.createOrgSecret(toolInput.orgId as number, {
         name: toolInput.name,
         value: toolInput.value,
+        events: toolInput.events,
       });
     } else if (toolName === 'update_org_secret') {
       result = await client.updateOrgSecret(
