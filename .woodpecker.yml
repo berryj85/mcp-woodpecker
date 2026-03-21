@@ -38,8 +38,10 @@ steps:
       NPM_TOKEN:
         from_secret: NPM_TOKEN
     commands:
-      - npm ci
-      - npm run build
-      - echo "@devpuccino:registry=https://registry.npmjs.org/" > ~/.npmrc
-      - echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" >> ~/.npmrc
-      - npm publish --access public
+      commands:
+        - npm ci
+        - npm run build
+        - echo "@devpuccino:registry=https://registry.npmjs.org/" > ~/.npmrc
+        - echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" >> ~/.npmrc
+        - cat ~/.npmrc  # Debug: show what's in the file
+        - npm publish --access public
