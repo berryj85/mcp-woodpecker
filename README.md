@@ -13,7 +13,7 @@ Perfect for automating CI/CD workflows, integrating with Claude AI, or building 
 
 | Component | Version | Notes |
 |-----------|---------|-------|
-| **mcp-woodpecker** | 1.1.3+ | MCP Server implementation |
+| **mcp-woodpecker** | 1.1.2+ | MCP Server implementation |
 | **Woodpecker CI API** | 3.13.0+ | Tested against Woodpecker CI v3.13.0 (January 2026) |
 | **Node.js** | 18.0.0+ | Minimum required version |
 | **MCP SDK** | ^1.27.1 | Model Context Protocol SDK |
@@ -21,10 +21,6 @@ Perfect for automating CI/CD workflows, integrating with Claude AI, or building 
 This server is compatible with Woodpecker CI 3.13.0 and later. The implementation follows the official Woodpecker API specification with support for modern endpoints and features.
 
 ## 📝 Changelog
-
-### v1.1.3 (2026-03-21) - Bugfix Release
-- **Fixed:** `create_org_secret` tool now includes required `events` parameter — resolves "invalid secret event: no event specified" error
-- **Tested:** All 24 integration tests passing
 
 ### v1.1.2 (2026-03-21) - Bugfix Release
 - **Fixed:** `get_server_info` tool removed — `/version` endpoint returns HTML on live deployments
