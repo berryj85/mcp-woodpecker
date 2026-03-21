@@ -36,6 +36,7 @@ steps:
     secrets:
       - NPM_TOKEN
     commands:
+      - env | grep -i npm || echo "No NPM vars found"
       - npm ci
       - npm run build
       - npm config set registry https://registry.npmjs.org/
