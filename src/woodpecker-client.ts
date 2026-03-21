@@ -267,45 +267,45 @@ export class WoodpeckerClient {
   async listRegistries(owner: string, repo: string): Promise<unknown[]>;
   async listRegistries(repoIdOrOwner: number | string, repo?: string): Promise<unknown[]> {
     if (typeof repoIdOrOwner === 'number') {
-      return this.request('GET', `/repos/${repoIdOrOwner}/registry`);
+      return this.request('GET', `/repos/${repoIdOrOwner}/registries`);
     }
-    return this.request('GET', `/repos/${repoIdOrOwner}/${repo}/registry`);
+    return this.request('GET', `/repos/${repoIdOrOwner}/${repo}/registries`);
   }
 
   async getRegistry(repoId: number, registry: string): Promise<unknown>;
   async getRegistry(owner: string, repo: string, registry: string): Promise<unknown>;
   async getRegistry(repoIdOrOwner: number | string, registryOrRepo: string, registry?: string): Promise<unknown> {
     if (typeof repoIdOrOwner === 'number') {
-      return this.request('GET', `/repos/${repoIdOrOwner}/registry/${registryOrRepo}`);
+      return this.request('GET', `/repos/${repoIdOrOwner}/registries/${registryOrRepo}`);
     }
-    return this.request('GET', `/repos/${repoIdOrOwner}/${registryOrRepo}/registry/${registry}`);
+    return this.request('GET', `/repos/${repoIdOrOwner}/${registryOrRepo}/registries/${registry}`);
   }
 
   async createRegistry(repoId: number, data: unknown): Promise<unknown>;
   async createRegistry(owner: string, repo: string, data: unknown): Promise<unknown>;
   async createRegistry(repoIdOrOwner: number | string, dataOrRepo: unknown, data?: unknown): Promise<unknown> {
     if (typeof repoIdOrOwner === 'number') {
-      return this.request('POST', `/repos/${repoIdOrOwner}/registry`, dataOrRepo);
+      return this.request('POST', `/repos/${repoIdOrOwner}/registries`, dataOrRepo);
     }
-    return this.request('POST', `/repos/${repoIdOrOwner}/${dataOrRepo}/registry`, data);
+    return this.request('POST', `/repos/${repoIdOrOwner}/${dataOrRepo}/registries`, data);
   }
 
   async updateRegistry(repoId: number, registry: string, data: unknown): Promise<unknown>;
   async updateRegistry(owner: string, repo: string, registry: string, data: unknown): Promise<unknown>;
   async updateRegistry(repoIdOrOwner: number | string, registryOrRepo: string, dataOrRegistry?: string | unknown, data?: unknown): Promise<unknown> {
     if (typeof repoIdOrOwner === 'number') {
-      return this.request('PATCH', `/repos/${repoIdOrOwner}/registry/${registryOrRepo}`, dataOrRegistry);
+      return this.request('PATCH', `/repos/${repoIdOrOwner}/registries/${registryOrRepo}`, dataOrRegistry);
     }
-    return this.request('PATCH', `/repos/${repoIdOrOwner}/${registryOrRepo}/registry/${dataOrRegistry}`, data);
+    return this.request('PATCH', `/repos/${repoIdOrOwner}/${registryOrRepo}/registries/${dataOrRegistry}`, data);
   }
 
   async deleteRegistry(repoId: number, registry: string): Promise<void>;
   async deleteRegistry(owner: string, repo: string, registry: string): Promise<void>;
   async deleteRegistry(repoIdOrOwner: number | string, registryOrRepo: string, registry?: string): Promise<void> {
     if (typeof repoIdOrOwner === 'number') {
-      return this.request('DELETE', `/repos/${repoIdOrOwner}/registry/${registryOrRepo}`);
+      return this.request('DELETE', `/repos/${repoIdOrOwner}/registries/${registryOrRepo}`);
     }
-    return this.request('DELETE', `/repos/${repoIdOrOwner}/${registryOrRepo}/registry/${registry}`);
+    return this.request('DELETE', `/repos/${repoIdOrOwner}/${registryOrRepo}/registries/${registry}`);
   }
 
   // Cron endpoints
@@ -313,27 +313,27 @@ export class WoodpeckerClient {
   async listCrons(owner: string, repo: string): Promise<unknown[]>;
   async listCrons(repoIdOrOwner: number | string, repo?: string): Promise<unknown[]> {
     if (typeof repoIdOrOwner === 'number') {
-      return this.request('GET', `/repos/${repoIdOrOwner}/crons`);
+      return this.request('GET', `/repos/${repoIdOrOwner}/cron`);
     }
-    return this.request('GET', `/repos/${repoIdOrOwner}/${repo}/crons`);
+    return this.request('GET', `/repos/${repoIdOrOwner}/${repo}/cron`);
   }
 
   async getCron(repoId: number, cron: number): Promise<unknown>;
   async getCron(owner: string, repo: string, cron: number): Promise<unknown>;
   async getCron(repoIdOrOwner: number | string, cronOrRepo: number | string, cron?: number): Promise<unknown> {
     if (typeof repoIdOrOwner === 'number') {
-      return this.request('GET', `/repos/${repoIdOrOwner}/crons/${cronOrRepo}`);
+      return this.request('GET', `/repos/${repoIdOrOwner}/cron/${cronOrRepo}`);
     }
-    return this.request('GET', `/repos/${repoIdOrOwner}/${cronOrRepo}/crons/${cron}`);
+    return this.request('GET', `/repos/${repoIdOrOwner}/${cronOrRepo}/cron/${cron}`);
   }
 
   async createCron(repoId: number, data: unknown): Promise<unknown>;
   async createCron(owner: string, repo: string, data: unknown): Promise<unknown>;
   async createCron(repoIdOrOwner: number | string, dataOrRepo: unknown, data?: unknown): Promise<unknown> {
     if (typeof repoIdOrOwner === 'number') {
-      return this.request('POST', `/repos/${repoIdOrOwner}/crons`, dataOrRepo);
+      return this.request('POST', `/repos/${repoIdOrOwner}/cron`, dataOrRepo);
     }
-    return this.request('POST', `/repos/${repoIdOrOwner}/${dataOrRepo}/crons`, data);
+    return this.request('POST', `/repos/${repoIdOrOwner}/${dataOrRepo}/cron`, data);
   }
 
   async updateCron(
@@ -354,18 +354,18 @@ export class WoodpeckerClient {
     data?: unknown
   ): Promise<unknown> {
     if (typeof repoIdOrOwner === 'number') {
-      return this.request('PATCH', `/repos/${repoIdOrOwner}/crons/${cronOrRepo}`, dataOrCron);
+      return this.request('PATCH', `/repos/${repoIdOrOwner}/cron/${cronOrRepo}`, dataOrCron);
     }
-    return this.request('PATCH', `/repos/${repoIdOrOwner}/${cronOrRepo}/crons/${dataOrCron}`, data);
+    return this.request('PATCH', `/repos/${repoIdOrOwner}/${cronOrRepo}/cron/${dataOrCron}`, data);
   }
 
   async deleteCron(repoId: number, cron: number): Promise<void>;
   async deleteCron(owner: string, repo: string, cron: number): Promise<void>;
   async deleteCron(repoIdOrOwner: number | string, cronOrRepo: number | string, cron?: number): Promise<void> {
     if (typeof repoIdOrOwner === 'number') {
-      return this.request('DELETE', `/repos/${repoIdOrOwner}/crons/${cronOrRepo}`);
+      return this.request('DELETE', `/repos/${repoIdOrOwner}/cron/${cronOrRepo}`);
     }
-    return this.request('DELETE', `/repos/${repoIdOrOwner}/${cronOrRepo}/crons/${cron}`);
+    return this.request('DELETE', `/repos/${repoIdOrOwner}/${cronOrRepo}/cron/${cron}`);
   }
 
   // Organization secrets
