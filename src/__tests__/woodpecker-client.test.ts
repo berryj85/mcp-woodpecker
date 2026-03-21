@@ -480,6 +480,67 @@ describe('WoodpeckerClient', () => {
       expect(result).toEqual(mockRegistry);
     });
 
+    it('should update a registry with owner/repo', async () => {
+      const updateData = { username: 'newuser', password: 'newpass' };
+      const mockRegistry = { id: 1, address: 'docker.io', ...updateData };
+      mockFetch.mockResolvedValueOnce(createMockResponse(mockRegistry));
+
+      const result = await client.updateRegistry(
+        'user1',
+        'repo1',
+        'docker.io',
+        updateData
+      );
+
+      expect(mockFetch).toHaveBeenCalledWith(
+        `${baseUrl}/api/repos/user1/repo1/registry/docker.io`,
+        expect.objectContaining({
+          method: 'PATCH',
+          body: JSON.stringify(updateData),
+        })
+      );
+      expect(result).toEqual(mockRegistry);
+    });
+
+    it('should update a registry with repoId', async () => {
+      const updateData = { password: 'newpass' };
+      const mockRegistry = { id: 1, address: 'gcr.io', ...updateData };
+      mockFetch.mockResolvedValueOnce(createMockResponse(mockRegistry));
+
+      const result = await client.updateRegistry(123, 'gcr.io', updateData);
+
+      expect(mockFetch).toHaveBeenCalledWith(
+        `${baseUrl}/api/repos/123/registry/gcr.io`,
+        expect.objectContaining({
+          method: 'PATCH',
+          body: JSON.stringify(updateData),
+        })
+      );
+      expect(result).toEqual(mockRegistry);
+    });
+
+    it('should update registry with partial data', async () => {
+      const updateData = { username: 'updated' };
+      const mockRegistry = { id: 1, address: 'ecr.aws', ...updateData };
+      mockFetch.mockResolvedValueOnce(createMockResponse(mockRegistry));
+
+      const result = await client.updateRegistry(
+        'org',
+        'project',
+        'ecr.aws',
+        updateData
+      );
+
+      expect(mockFetch).toHaveBeenCalledWith(
+        `${baseUrl}/api/repos/org/project/registry/ecr.aws`,
+        expect.objectContaining({
+          method: 'PATCH',
+          body: JSON.stringify(updateData),
+        })
+      );
+      expect(result).toEqual(mockRegistry);
+    });
+
     it('should delete a registry', async () => {
       mockFetch.mockResolvedValueOnce(createMockResponse(null));
 
@@ -487,6 +548,17 @@ describe('WoodpeckerClient', () => {
 
       expect(mockFetch).toHaveBeenCalledWith(
         `${baseUrl}/api/repos/user1/repo1/registry/docker.io`,
+        expect.objectContaining({ method: 'DELETE' })
+      );
+    });
+
+    it('should delete a registry with repoId', async () => {
+      mockFetch.mockResolvedValueOnce(createMockResponse(null));
+
+      await client.deleteRegistry(456, 'gcr.io');
+
+      expect(mockFetch).toHaveBeenCalledWith(
+        `${baseUrl}/api/repos/456/registry/gcr.io`,
         expect.objectContaining({ method: 'DELETE' })
       );
     });
