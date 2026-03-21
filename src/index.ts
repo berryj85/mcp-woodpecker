@@ -32,7 +32,7 @@ const client = new WoodpeckerClient({
 const server = new Server(
   {
     name: 'mcp-woodpecker',
-    version: '1.0.0',
+    version: '1.1.0',
   },
   {
     capabilities: {

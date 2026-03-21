@@ -5,9 +5,20 @@
 [![Node.js Version](https://img.shields.io/badge/node-%3E%3D18.0.0-brightgreen.svg)](https://nodejs.org/)
 [![status-badge](https://woodpecker.devpuccino.com/api/badges/2/status.svg?events=tag)](https://woodpecker.devpuccino.com/repos/2)
 
-A comprehensive [Model Context Protocol (MCP)](https://modelcontextprotocol.io) server for seamlessly integrating [Woodpecker CI](https://woodpecker-ci.org) with AI-powered tools. This server provides 40+ tools to manage repositories, pipelines, secrets, registries, crons, and organization settings programmatically.
+A comprehensive [Model Context Protocol (MCP)](https://modelcontextprotocol.io) server for seamlessly integrating [Woodpecker CI](https://woodpecker-ci.org) with AI-powered tools. This server provides 41+ tools to manage repositories, pipelines, secrets, registries, crons, and organization settings programmatically. Fully compatible with Woodpecker CI 3.13.0 API.
 
 Perfect for automating CI/CD workflows, integrating with Claude AI, or building custom Woodpecker management tools.
+
+## 🔄 Compatibility
+
+| Component | Version | Notes |
+|-----------|---------|-------|
+| **mcp-woodpecker** | 1.1.0+ | MCP Server implementation |
+| **Woodpecker CI API** | 3.13.0+ | Tested against Woodpecker CI v3.13.0 (January 2026) |
+| **Node.js** | 18.0.0+ | Minimum required version |
+| **MCP SDK** | ^1.27.1 | Model Context Protocol SDK |
+
+This server is compatible with Woodpecker CI 3.13.0 and later. The implementation follows the official Woodpecker API specification with support for modern endpoints and features.
 
 ## ✨ Features
 
@@ -144,6 +155,7 @@ Add to your `.claude/config.json`:
 - `list_registries` - List configured Docker registries
 - `get_registry` - Get registry configuration
 - `create_registry` - Add a new registry
+- `update_registry` - Update registry credentials (new in v1.1.0)
 - `delete_registry` - Remove a registry
 
 ### Cron Job Tools
