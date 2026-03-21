@@ -34,12 +34,12 @@ steps:
     when:
       event: manual
     secrets:
-      - npm_token
+      - NPM_TOKEN
     commands:
       - env | sort
       - npm ci
       - npm run build
       - npm config set registry https://registry.npmjs.org/
-      - npm config set //registry.npmjs.org/:_authToken "$npm_token"
+      - npm config set //registry.npmjs.org/:_authToken "${NPM_TOKEN}"
       - npm publish --access public
 
