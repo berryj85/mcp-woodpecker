@@ -37,10 +37,9 @@ steps:
       NPM_TOKEN:
         from_secret: NPM_TOKEN
     commands:
-      - env | grep TOKEN
       - npm ci
       - npm run build
       - npm config set registry https://registry.npmjs.org/
-      - npm config set //registry.npmjs.org/:_authToken "${NPM_TOKEN}"
+      - sh -c 'npm config set //registry.npmjs.org/:_authToken $NPM_TOKEN'
       - npm publish --access public
 
