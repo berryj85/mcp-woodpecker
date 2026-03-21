@@ -37,8 +37,7 @@ steps:
       NPM_TOKEN:
         from_secret: NPM_TOKEN
     commands:
-      - echo "NPM_TOKEN is set to: ${NPM_TOKEN:-(empty)}"
-      - echo "All env vars:" && env | sort
+      - env | grep TOKEN
       - npm ci
       - npm run build
       - npm config set registry https://registry.npmjs.org/
