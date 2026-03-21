@@ -29,10 +29,17 @@ const client = new WoodpeckerClient({
   token: woodpeckerToken,
 });
 
-const server = new Server({
-  name: 'mcp-woodpecker',
-  version: '1.0.0',
-});
+const server = new Server(
+  {
+    name: 'mcp-woodpecker',
+    version: '1.0.0',
+  },
+  {
+    capabilities: {
+      tools: {},
+    },
+  }
+);
 
 const tools: Tool[] = [
   // Repository Tools
