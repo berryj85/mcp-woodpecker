@@ -13,12 +13,25 @@ Perfect for automating CI/CD workflows, integrating with Claude AI, or building 
 
 | Component | Version | Notes |
 |-----------|---------|-------|
-| **mcp-woodpecker** | 1.0.0+ | MCP Server implementation |
+| **mcp-woodpecker** | 1.1.1+ | MCP Server implementation |
 | **Woodpecker CI API** | 3.13.0+ | Tested against Woodpecker CI v3.13.0 (January 2026) |
 | **Node.js** | 18.0.0+ | Minimum required version |
 | **MCP SDK** | ^1.27.1 | Model Context Protocol SDK |
 
 This server is compatible with Woodpecker CI 3.13.0 and later. The implementation follows the official Woodpecker API specification with support for modern endpoints and features.
+
+## 📝 Changelog
+
+### v1.1.1 (2026-03-21) - Bugfix Release
+- **Fixed:** API endpoint paths for registry operations (`/registry` → `/registries`)
+- **Fixed:** API endpoint paths for cron operations (`/crons` → `/cron`)
+- **Fixed:** All paths now match Woodpecker CI API v3.13.0 specification
+- **Tested:** All 47 unit tests passing
+
+### v1.1.0 (2026-03-21)
+- **Added:** `updateRegistry()` method for updating registry credentials
+- **Updated:** Version documentation and compatibility matrix
+- **Tested:** Comprehensive registry CRUD operations
 
 ## ✨ Features
 
