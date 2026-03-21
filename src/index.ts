@@ -32,7 +32,7 @@ const client = new WoodpeckerClient({
 const server = new Server(
   {
     name: 'mcp-woodpecker',
-    version: '1.1.1',
+    version: '1.1.2',
   },
   {
     capabilities: {
@@ -68,16 +68,16 @@ const tools: Tool[] = [
   },
   {
     name: 'activate_repository',
-    description: 'Activate a repository in Woodpecker',
+    description: 'Activate a repository in Woodpecker using the forge remote ID',
     inputSchema: {
       type: 'object',
       properties: {
-        repoId: {
-          type: 'number',
-          description: 'Repository ID',
+        forgeRemoteId: {
+          type: 'string',
+          description: 'The repository ID at the forge (e.g. GitHub repository ID)',
         },
       },
-      required: ['repoId'],
+      required: ['forgeRemoteId'],
     },
   },
   {
@@ -561,19 +561,35 @@ const tools: Tool[] = [
     },
   },
 
-  // Organization Secret Tools
+  // Organization Tools
   {
-    name: 'list_org_secrets',
-    description: 'List all organization-level secrets',
+    name: 'lookup_organization',
+    description: 'Look up an organization by its full name/slug to get its numeric ID (required for org secret operations)',
     inputSchema: {
       type: 'object',
       properties: {
-        org: {
+        orgFullName: {
           type: 'string',
-          description: 'Organization name',
+          description: 'Organization full name or slug (e.g. "my-org")',
         },
       },
-      required: ['org'],
+      required: ['orgFullName'],
+    },
+  },
+
+  // Organization Secret Tools
+  {
+    name: 'list_org_secrets',
+    description: 'List all organization-level secrets. Use lookup_organization first to get the numeric orgId.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        orgId: {
+          type: 'number',
+          description: 'Organization numeric ID (use lookup_organization to find this)',
+        },
+      },
+      required: ['orgId'],
     },
   },
   {
@@ -582,16 +598,16 @@ const tools: Tool[] = [
     inputSchema: {
       type: 'object',
       properties: {
-        org: {
-          type: 'string',
-          description: 'Organization name',
+        orgId: {
+          type: 'number',
+          description: 'Organization numeric ID',
         },
         secret: {
           type: 'string',
           description: 'Secret name',
         },
       },
-      required: ['org', 'secret'],
+      required: ['orgId', 'secret'],
     },
   },
   {
@@ -600,9 +616,9 @@ const tools: Tool[] = [
     inputSchema: {
       type: 'object',
       properties: {
-        org: {
-          type: 'string',
-          description: 'Organization name',
+        orgId: {
+          type: 'number',
+          description: 'Organization numeric ID',
         },
         name: {
           type: 'string',
@@ -612,8 +628,13 @@ const tools: Tool[] = [
           type: 'string',
           description: 'Secret value',
         },
+        events: {
+          type: 'array',
+          items: { type: 'string' },
+          description: 'Events that trigger this secret (push, pull_request, tag, deployment, cron)',
+        },
       },
-      required: ['org', 'name', 'value'],
+      required: ['orgId', 'name', 'value'],
     },
   },
   {
@@ -622,9 +643,9 @@ const tools: Tool[] = [
     inputSchema: {
       type: 'object',
       properties: {
-        org: {
-          type: 'string',
-          description: 'Organization name',
+        orgId: {
+          type: 'number',
+          description: 'Organization numeric ID',
         },
         secret: {
           type: 'string',
@@ -635,7 +656,7 @@ const tools: Tool[] = [
           description: 'New secret value',
         },
       },
-      required: ['org', 'secret', 'value'],
+      required: ['orgId', 'secret', 'value'],
     },
   },
   {
@@ -644,32 +665,23 @@ const tools: Tool[] = [
     inputSchema: {
       type: 'object',
       properties: {
-        org: {
-          type: 'string',
-          description: 'Organization name',
+        orgId: {
+          type: 'number',
+          description: 'Organization numeric ID',
         },
         secret: {
           type: 'string',
           description: 'Secret name',
         },
       },
-      required: ['org', 'secret'],
+      required: ['orgId', 'secret'],
     },
   },
 
-  // User/Server Info Tools
+  // User Info Tools
   {
     name: 'get_current_user',
     description: 'Get information about the currently authenticated user',
-    inputSchema: {
-      type: 'object',
-      properties: {},
-      required: [],
-    },
-  },
-  {
-    name: 'get_server_info',
-    description: 'Get Woodpecker server version and build information',
     inputSchema: {
       type: 'object',
       properties: {},
@@ -695,7 +707,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
     } else if (toolName === 'get_repository') {
       result = await client.getRepository(toolInput.repoId as number);
     } else if (toolName === 'activate_repository') {
-      result = await client.activateRepository(toolInput.repoId as number);
+      result = await client.activateRepository(toolInput.forgeRemoteId as string);
     } else if (toolName === 'update_repository') {
       const data: Record<string, unknown> = {};
       if (toolInput.is_trusted !== undefined)
@@ -813,13 +825,13 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
     } else if (toolName === 'create_cron') {
       result = await client.createCron(toolInput.repoId as number, {
         name: toolInput.name,
-        expr: toolInput.expr,
+        schedule: toolInput.expr,
         branch: toolInput.branch,
       });
     } else if (toolName === 'update_cron') {
       const cronData: Record<string, unknown> = {};
       if (toolInput.name !== undefined) cronData.name = toolInput.name;
-      if (toolInput.expr !== undefined) cronData.expr = toolInput.expr;
+      if (toolInput.expr !== undefined) cronData.schedule = toolInput.expr;
       if (toolInput.branch !== undefined) cronData.branch = toolInput.branch;
       result = await client.updateCron(
         toolInput.repoId as number,
@@ -834,38 +846,42 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       result = { status: 'Cron job deleted successfully' };
     }
 
+    // Organization operations
+    else if (toolName === 'lookup_organization') {
+      result = await client.lookupOrganization(toolInput.orgFullName as string);
+    }
+
     // Organization secret operations
     else if (toolName === 'list_org_secrets') {
-      result = await client.listOrgSecrets(toolInput.org as string);
+      result = await client.listOrgSecrets(toolInput.orgId as number);
     } else if (toolName === 'get_org_secret') {
       result = await client.getOrgSecret(
-        toolInput.org as string,
+        toolInput.orgId as number,
         toolInput.secret as string
       );
     } else if (toolName === 'create_org_secret') {
-      result = await client.createOrgSecret(toolInput.org as string, {
+      result = await client.createOrgSecret(toolInput.orgId as number, {
         name: toolInput.name,
         value: toolInput.value,
+        events: toolInput.events,
       });
     } else if (toolName === 'update_org_secret') {
       result = await client.updateOrgSecret(
-        toolInput.org as string,
+        toolInput.orgId as number,
         toolInput.secret as string,
         { value: toolInput.value }
       );
     } else if (toolName === 'delete_org_secret') {
       result = await client.deleteOrgSecret(
-        toolInput.org as string,
+        toolInput.orgId as number,
         toolInput.secret as string
       );
       result = { status: 'Organization secret deleted successfully' };
     }
 
-    // User/Server info
+    // User info
     else if (toolName === 'get_current_user') {
       result = await client.getCurrentUser();
-    } else if (toolName === 'get_server_info') {
-      result = await client.getServerInfo();
     } else {
       throw new Error(`Unknown tool: ${toolName}`);
     }
