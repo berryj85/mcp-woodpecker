@@ -357,38 +357,38 @@ export class WoodpeckerClient {
     return this.request('DELETE', `/repos/${repoIdOrOwner}/${cronOrRepo}/cron/${cron}`);
   }
 
-  // Organization secrets
-  async listOrgSecrets(org: string): Promise<unknown[]> {
-    return this.request('GET', `/orgs/${org}/secrets`);
+  // Organization endpoints
+  async lookupOrganization(orgFullName: string): Promise<unknown> {
+    return this.request('GET', `/orgs/lookup/${encodeURIComponent(orgFullName)}`);
   }
 
-  async getOrgSecret(org: string, secret: string): Promise<unknown> {
-    return this.request('GET', `/orgs/${org}/secrets/${secret}`);
+  // Organization secrets (org_id is the numeric Org.id, not the org name)
+  async listOrgSecrets(orgId: number): Promise<unknown[]> {
+    return this.request('GET', `/orgs/${orgId}/secrets`);
   }
 
-  async createOrgSecret(org: string, data: unknown): Promise<unknown> {
-    return this.request('POST', `/orgs/${org}/secrets`, data);
+  async getOrgSecret(orgId: number, secret: string): Promise<unknown> {
+    return this.request('GET', `/orgs/${orgId}/secrets/${secret}`);
+  }
+
+  async createOrgSecret(orgId: number, data: unknown): Promise<unknown> {
+    return this.request('POST', `/orgs/${orgId}/secrets`, data);
   }
 
   async updateOrgSecret(
-    org: string,
+    orgId: number,
     secret: string,
     data: unknown
   ): Promise<unknown> {
-    return this.request('PATCH', `/orgs/${org}/secrets/${secret}`, data);
+    return this.request('PATCH', `/orgs/${orgId}/secrets/${secret}`, data);
   }
 
-  async deleteOrgSecret(org: string, secret: string): Promise<void> {
-    return this.request('DELETE', `/orgs/${org}/secrets/${secret}`);
+  async deleteOrgSecret(orgId: number, secret: string): Promise<void> {
+    return this.request('DELETE', `/orgs/${orgId}/secrets/${secret}`);
   }
 
   // User endpoints
   async getCurrentUser(): Promise<unknown> {
     return this.request('GET', '/user');
-  }
-
-  // Server info
-  async getServerInfo(): Promise<unknown> {
-    return this.request('GET', '/version');
   }
 }

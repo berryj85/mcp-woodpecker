@@ -643,6 +643,27 @@ describe('WoodpeckerClient', () => {
     });
   });
 
+  describe('Organization endpoints', () => {
+    let client: WoodpeckerClient;
+
+    beforeEach(() => {
+      client = new WoodpeckerClient({ baseUrl, token });
+    });
+
+    it('should lookup an organization by full name', async () => {
+      const mockOrg = { id: 42, name: 'my-org', is_user: false };
+      mockFetch.mockResolvedValueOnce(createMockResponse(mockOrg));
+
+      const result = await client.lookupOrganization('my-org');
+
+      expect(mockFetch).toHaveBeenCalledWith(
+        `${baseUrl}/api/orgs/lookup/my-org`,
+        expect.objectContaining({ method: 'GET' })
+      );
+      expect(result).toEqual(mockOrg);
+    });
+  });
+
   describe('Organization Secrets endpoints', () => {
     let client: WoodpeckerClient;
 
@@ -654,10 +675,10 @@ describe('WoodpeckerClient', () => {
       const mockSecrets = [{ id: 1, name: 'ORG_KEY' }];
       mockFetch.mockResolvedValueOnce(createMockResponse(mockSecrets));
 
-      const result = await client.listOrgSecrets('org1');
+      const result = await client.listOrgSecrets(42);
 
       expect(mockFetch).toHaveBeenCalledWith(
-        `${baseUrl}/api/orgs/org1/secrets`,
+        `${baseUrl}/api/orgs/42/secrets`,
         expect.objectContaining({ method: 'GET' })
       );
       expect(result).toEqual(mockSecrets);
@@ -667,10 +688,10 @@ describe('WoodpeckerClient', () => {
       const mockSecret = { id: 1, name: 'ORG_KEY' };
       mockFetch.mockResolvedValueOnce(createMockResponse(mockSecret));
 
-      const result = await client.getOrgSecret('org1', 'ORG_KEY');
+      const result = await client.getOrgSecret(42, 'ORG_KEY');
 
       expect(mockFetch).toHaveBeenCalledWith(
-        `${baseUrl}/api/orgs/org1/secrets/ORG_KEY`,
+        `${baseUrl}/api/orgs/42/secrets/ORG_KEY`,
         expect.objectContaining({ method: 'GET' })
       );
       expect(result).toEqual(mockSecret);
@@ -681,10 +702,10 @@ describe('WoodpeckerClient', () => {
       const mockSecret = { id: 1, ...secretData };
       mockFetch.mockResolvedValueOnce(createMockResponse(mockSecret));
 
-      const result = await client.createOrgSecret('org1', secretData);
+      const result = await client.createOrgSecret(42, secretData);
 
       expect(mockFetch).toHaveBeenCalledWith(
-        `${baseUrl}/api/orgs/org1/secrets`,
+        `${baseUrl}/api/orgs/42/secrets`,
         expect.objectContaining({
           method: 'POST',
           body: JSON.stringify(secretData),
@@ -698,10 +719,10 @@ describe('WoodpeckerClient', () => {
       const mockSecret = { id: 1, name: 'ORG_KEY', ...updateData };
       mockFetch.mockResolvedValueOnce(createMockResponse(mockSecret));
 
-      const result = await client.updateOrgSecret('org1', 'ORG_KEY', updateData);
+      const result = await client.updateOrgSecret(42, 'ORG_KEY', updateData);
 
       expect(mockFetch).toHaveBeenCalledWith(
-        `${baseUrl}/api/orgs/org1/secrets/ORG_KEY`,
+        `${baseUrl}/api/orgs/42/secrets/ORG_KEY`,
         expect.objectContaining({
           method: 'PATCH',
           body: JSON.stringify(updateData),
@@ -713,16 +734,16 @@ describe('WoodpeckerClient', () => {
     it('should delete an organization secret', async () => {
       mockFetch.mockResolvedValueOnce(createMockResponse(null));
 
-      await client.deleteOrgSecret('org1', 'ORG_KEY');
+      await client.deleteOrgSecret(42, 'ORG_KEY');
 
       expect(mockFetch).toHaveBeenCalledWith(
-        `${baseUrl}/api/orgs/org1/secrets/ORG_KEY`,
+        `${baseUrl}/api/orgs/42/secrets/ORG_KEY`,
         expect.objectContaining({ method: 'DELETE' })
       );
     });
   });
 
-  describe('User and Server endpoints', () => {
+  describe('User endpoints', () => {
     let client: WoodpeckerClient;
 
     beforeEach(() => {
@@ -740,19 +761,6 @@ describe('WoodpeckerClient', () => {
         expect.objectContaining({ method: 'GET' })
       );
       expect(result).toEqual(mockUser);
-    });
-
-    it('should get server info', async () => {
-      const mockVersion = { version: '1.0.0' };
-      mockFetch.mockResolvedValueOnce(createMockResponse(mockVersion));
-
-      const result = await client.getServerInfo();
-
-      expect(mockFetch).toHaveBeenCalledWith(
-        `${baseUrl}/api/version`,
-        expect.objectContaining({ method: 'GET' })
-      );
-      expect(result).toEqual(mockVersion);
     });
   });
 });

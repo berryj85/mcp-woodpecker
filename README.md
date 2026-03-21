@@ -29,6 +29,9 @@ This server is compatible with Woodpecker CI 3.13.0 and later. The implementatio
 - **Fixed:** `deletePipelineLogs` path corrected to `/repos/{id}/logs/{number}` per API spec
 - **Fixed:** `activateRepository` now uses `POST /repos?forge_remote_id=...` (query param, not path param)
 - **Fixed:** Cron create/update now sends `schedule` field instead of `expr` to match API schema
+- **Fixed:** `list_org_secrets` and all org secret tools now require numeric `orgId` (not org name) — matches `GET /orgs/{org_id}/secrets` API spec
+- **Added:** `lookup_organization` tool — resolves org name → numeric ID via `GET /orgs/lookup/{org_full_name}`
+- **Removed:** `get_server_info` tool — `/version` endpoint returns HTML on this deployment (no reliable alternative)
 - **Tested:** All 47 unit tests updated and passing
 
 ### v1.1.0 (2026-03-21)
