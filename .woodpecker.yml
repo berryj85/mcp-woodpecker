@@ -34,10 +34,10 @@ steps:
     when:
       event: manual
     environment:
+      NPM_CONFIG_REGISTRY: https://registry.npmjs.org/
       NPM_TOKEN:
         from_secret: NPM_TOKEN
     commands:
-      - 'if [ -n "$NPM_TOKEN" ]; then echo "Token exists"; else echo "Token missing"; fi'
       - npm ci
       - npm run build
       - echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc
