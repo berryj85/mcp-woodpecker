@@ -46,6 +46,18 @@ export class WoodpeckerClient {
       );
     }
 
+    if (response.status === 204 || response.headers?.get?.('content-length') === '0') {
+      return undefined as T;
+    }
+
+    const contentType = response.headers?.get?.('content-type') ?? '';
+    if (!contentType.includes('application/json')) {
+      const body = await response.text();
+      throw new Error(
+        `Woodpecker API returned non-JSON response (${contentType}):\n${body.slice(0, 500)}`
+      );
+    }
+
     return response.json() as Promise<T>;
   }
 
@@ -54,24 +66,40 @@ export class WoodpeckerClient {
     return this.request('GET', '/repos');
   }
 
-  async getRepository(owner: string, repo: string): Promise<unknown> {
-    return this.request('GET', `/repos/${owner}/${repo}`);
+  async getRepository(repoId: number): Promise<unknown>;
+  async getRepository(owner: string, repo: string): Promise<unknown>;
+  async getRepository(repoIdOrOwner: number | string, repo?: string): Promise<unknown> {
+    if (typeof repoIdOrOwner === 'number') {
+      return this.request('GET', `/repos/${repoIdOrOwner}`);
+    }
+    return this.request('GET', `/repos/${repoIdOrOwner}/${repo}`);
   }
 
-  async updateRepository(
-    owner: string,
-    repo: string,
-    data: unknown
-  ): Promise<unknown> {
-    return this.request('PATCH', `/repos/${owner}/${repo}`, data);
+  async activateRepository(repoId: number): Promise<unknown>;
+  async activateRepository(owner: string, repo: string): Promise<unknown>;
+  async activateRepository(repoIdOrOwner: number | string, repo?: string): Promise<unknown> {
+    if (typeof repoIdOrOwner === 'number') {
+      return this.request('POST', `/repos/${repoIdOrOwner}`);
+    }
+    return this.request('POST', `/repos/${repoIdOrOwner}/${repo}`, {});
   }
 
-  async deleteRepository(owner: string, repo: string): Promise<void> {
-    return this.request('DELETE', `/repos/${owner}/${repo}`);
+  async updateRepository(repoId: number, data: unknown): Promise<unknown>;
+  async updateRepository(owner: string, repo: string, data: unknown): Promise<unknown>;
+  async updateRepository(repoIdOrOwner: number | string, repoOrData: string | unknown, data?: unknown): Promise<unknown> {
+    if (typeof repoOrData === 'string') {
+      return this.request('PATCH', `/repos/${repoIdOrOwner}/${repoOrData}`, data);
+    }
+    return this.request('PATCH', `/repos/${repoIdOrOwner}`, repoOrData);
   }
 
-  async activateRepository(owner: string, repo: string): Promise<unknown> {
-    return this.request('POST', `/repos/${owner}/${repo}`, {});
+  async deleteRepository(repoId: number): Promise<void>;
+  async deleteRepository(owner: string, repo: string): Promise<void>;
+  async deleteRepository(repoIdOrOwner: number | string, repo?: string): Promise<void> {
+    if (typeof repoIdOrOwner === 'number') {
+      return this.request('DELETE', `/repos/${repoIdOrOwner}`);
+    }
+    return this.request('DELETE', `/repos/${repoIdOrOwner}/${repo}`);
   }
 
   async repairRepositories(): Promise<unknown> {
@@ -80,199 +108,255 @@ export class WoodpeckerClient {
 
   // Pipeline endpoints
   async listPipelines(
+    repoId: number,
+    options?: { branch?: string; status?: string }
+  ): Promise<unknown[]>;
+  async listPipelines(
     owner: string,
     repo: string,
     options?: { branch?: string; status?: string }
+  ): Promise<unknown[]>;
+  async listPipelines(
+    repoIdOrOwner: number | string,
+    repoOrOptions?: string | { branch?: string; status?: string },
+    options?: { branch?: string; status?: string }
   ): Promise<unknown[]> {
-    let path = `/repos/${owner}/${repo}/pipelines`;
-    if (options) {
+    let path: string;
+    let actualOptions: { branch?: string; status?: string } | undefined;
+
+    if (typeof repoIdOrOwner === 'number') {
+      path = `/repos/${repoIdOrOwner}/pipelines`;
+      actualOptions = repoOrOptions as { branch?: string; status?: string } | undefined;
+    } else {
+      path = `/repos/${repoIdOrOwner}/${repoOrOptions}/pipelines`;
+      actualOptions = options;
+    }
+
+    if (actualOptions) {
       const params = new URLSearchParams();
-      if (options.branch) params.append('branch', options.branch);
-      if (options.status) params.append('status', options.status);
+      if (actualOptions.branch) params.append('branch', actualOptions.branch);
+      if (actualOptions.status) params.append('status', actualOptions.status);
       if (params.toString()) path += `?${params.toString()}`;
     }
     return this.request('GET', path);
   }
 
-  async getPipeline(
-    owner: string,
-    repo: string,
-    number: number
-  ): Promise<unknown> {
-    return this.request('GET', `/repos/${owner}/${repo}/pipelines/${number}`);
+  async getPipeline(repoId: number, number: number): Promise<unknown>;
+  async getPipeline(owner: string, repo: string, number: number): Promise<unknown>;
+  async getPipeline(repoIdOrOwner: number | string, numberOrRepo: number | string, number?: number): Promise<unknown> {
+    if (typeof repoIdOrOwner === 'number') {
+      return this.request('GET', `/repos/${repoIdOrOwner}/pipelines/${numberOrRepo}`);
+    }
+    return this.request('GET', `/repos/${repoIdOrOwner}/${numberOrRepo}/pipelines/${number}`);
   }
 
-  async createPipeline(
-    owner: string,
-    repo: string,
-    data: unknown
-  ): Promise<unknown> {
-    return this.request(
-      'POST',
-      `/repos/${owner}/${repo}/pipelines`,
-      data
-    );
+  async createPipeline(repoId: number, data: unknown): Promise<unknown>;
+  async createPipeline(owner: string, repo: string, data: unknown): Promise<unknown>;
+  async createPipeline(repoIdOrOwner: number | string, repoOrData: number | unknown, data?: unknown): Promise<unknown> {
+    if (typeof repoIdOrOwner === 'number') {
+      return this.request('POST', `/repos/${repoIdOrOwner}/pipelines`, repoOrData);
+    }
+    return this.request('POST', `/repos/${repoIdOrOwner}/${repoOrData}/pipelines`, data);
   }
 
-  async cancelPipeline(
-    owner: string,
-    repo: string,
-    number: number
-  ): Promise<void> {
-    return this.request(
-      'DELETE',
-      `/repos/${owner}/${repo}/pipelines/${number}`
-    );
+  async cancelPipeline(repoId: number, number: number): Promise<void>;
+  async cancelPipeline(owner: string, repo: string, number: number): Promise<void>;
+  async cancelPipeline(repoIdOrOwner: number | string, numberOrRepo: number | string, number?: number): Promise<void> {
+    if (typeof repoIdOrOwner === 'number') {
+      return this.request('DELETE', `/repos/${repoIdOrOwner}/pipelines/${numberOrRepo}`);
+    }
+    return this.request('DELETE', `/repos/${repoIdOrOwner}/${numberOrRepo}/pipelines/${number}`);
   }
 
-  async getPipelineStatus(
-    owner: string,
-    repo: string,
-    number: number
-  ): Promise<unknown> {
-    return this.request(
-      'GET',
-      `/repos/${owner}/${repo}/pipelines/${number}/status`
-    );
+  async getPipelineStatus(repoId: number, number: number): Promise<unknown>;
+  async getPipelineStatus(owner: string, repo: string, number: number): Promise<unknown>;
+  async getPipelineStatus(repoIdOrOwner: number | string, numberOrRepo: number | string, number?: number): Promise<unknown> {
+    if (typeof repoIdOrOwner === 'number') {
+      return this.request('GET', `/repos/${repoIdOrOwner}/pipelines/${numberOrRepo}/status`);
+    }
+    return this.request('GET', `/repos/${repoIdOrOwner}/${numberOrRepo}/pipelines/${number}/status`);
   }
 
   // Step/Build logs
-  async getStepLogs(
-    owner: string,
-    repo: string,
-    number: number,
-    step: number
-  ): Promise<unknown> {
+  async getStepLogs(repoId: number, number: number, step: number): Promise<unknown>;
+  async getStepLogs(owner: string, repo: string, number: number, step: number): Promise<unknown>;
+  async getStepLogs(repoIdOrOwner: number | string, numberOrRepo: number | string, stepOrNumber: number, step?: number): Promise<unknown> {
+    if (typeof repoIdOrOwner === 'number') {
+      return this.request(
+        'GET',
+        `/repos/${repoIdOrOwner}/pipelines/${numberOrRepo}/steps/${stepOrNumber}/logs`
+      );
+    }
     return this.request(
       'GET',
-      `/repos/${owner}/${repo}/pipelines/${number}/steps/${step}/logs`
+      `/repos/${repoIdOrOwner}/${numberOrRepo}/pipelines/${stepOrNumber}/steps/${step}/logs`
     );
   }
 
-  async deletePipelineLogs(
-    owner: string,
-    repo: string,
-    number: number
-  ): Promise<void> {
-    return this.request(
-      'DELETE',
-      `/repos/${owner}/${repo}/pipelines/${number}/logs`
-    );
+  async deletePipelineLogs(repoId: number, number: number): Promise<void>;
+  async deletePipelineLogs(owner: string, repo: string, number: number): Promise<void>;
+  async deletePipelineLogs(repoIdOrOwner: number | string, numberOrRepo: number | string, number?: number): Promise<void> {
+    if (typeof repoIdOrOwner === 'number') {
+      return this.request('DELETE', `/repos/${repoIdOrOwner}/pipelines/${numberOrRepo}/logs`);
+    }
+    return this.request('DELETE', `/repos/${repoIdOrOwner}/${numberOrRepo}/pipelines/${number}/logs`);
   }
 
   // Secrets endpoints
-  async listSecrets(owner: string, repo: string): Promise<unknown[]> {
-    return this.request('GET', `/repos/${owner}/${repo}/secrets`);
+  async listSecrets(repoId: number): Promise<unknown[]>;
+  async listSecrets(owner: string, repo: string): Promise<unknown[]>;
+  async listSecrets(repoIdOrOwner: number | string, repo?: string): Promise<unknown[]> {
+    if (typeof repoIdOrOwner === 'number') {
+      return this.request('GET', `/repos/${repoIdOrOwner}/secrets`);
+    }
+    return this.request('GET', `/repos/${repoIdOrOwner}/${repo}/secrets`);
   }
 
-  async getSecret(
-    owner: string,
-    repo: string,
-    secret: string
-  ): Promise<unknown> {
-    return this.request('GET', `/repos/${owner}/${repo}/secrets/${secret}`);
+  async getSecret(repoId: number, secret: string): Promise<unknown>;
+  async getSecret(owner: string, repo: string, secret: string): Promise<unknown>;
+  async getSecret(repoIdOrOwner: number | string, secretOrRepo: string, secret?: string): Promise<unknown> {
+    if (typeof repoIdOrOwner === 'number') {
+      return this.request('GET', `/repos/${repoIdOrOwner}/secrets/${secretOrRepo}`);
+    }
+    return this.request('GET', `/repos/${repoIdOrOwner}/${secretOrRepo}/secrets/${secret}`);
   }
 
-  async createSecret(
-    owner: string,
-    repo: string,
+  async createSecret(repoId: number, data: unknown): Promise<unknown>;
+  async createSecret(owner: string, repo: string, data: unknown): Promise<unknown>;
+  async createSecret(repoIdOrOwner: number | string, dataOrRepo: unknown, data?: unknown): Promise<unknown> {
+    if (typeof repoIdOrOwner === 'number') {
+      return this.request('POST', `/repos/${repoIdOrOwner}/secrets`, dataOrRepo);
+    }
+    return this.request('POST', `/repos/${repoIdOrOwner}/${dataOrRepo}/secrets`, data);
+  }
+
+  async updateSecret(
+    repoId: number,
+    secret: string,
     data: unknown
-  ): Promise<unknown> {
-    return this.request('POST', `/repos/${owner}/${repo}/secrets`, data);
-  }
-
+  ): Promise<unknown>;
   async updateSecret(
     owner: string,
     repo: string,
     secret: string,
     data: unknown
+  ): Promise<unknown>;
+  async updateSecret(
+    repoIdOrOwner: number | string,
+    secretOrRepo: string,
+    dataOrSecret: string | unknown,
+    data?: unknown
   ): Promise<unknown> {
-    return this.request(
-      'PATCH',
-      `/repos/${owner}/${repo}/secrets/${secret}`,
-      data
-    );
+    if (typeof repoIdOrOwner === 'number') {
+      return this.request('PATCH', `/repos/${repoIdOrOwner}/secrets/${secretOrRepo}`, dataOrSecret);
+    }
+    return this.request('PATCH', `/repos/${repoIdOrOwner}/${secretOrRepo}/secrets/${dataOrSecret}`, data);
   }
 
-  async deleteSecret(
-    owner: string,
-    repo: string,
-    secret: string
-  ): Promise<void> {
-    return this.request(
-      'DELETE',
-      `/repos/${owner}/${repo}/secrets/${secret}`
-    );
+  async deleteSecret(repoId: number, secret: string): Promise<void>;
+  async deleteSecret(owner: string, repo: string, secret: string): Promise<void>;
+  async deleteSecret(repoIdOrOwner: number | string, secretOrRepo: string, secret?: string): Promise<void> {
+    if (typeof repoIdOrOwner === 'number') {
+      return this.request('DELETE', `/repos/${repoIdOrOwner}/secrets/${secretOrRepo}`);
+    }
+    return this.request('DELETE', `/repos/${repoIdOrOwner}/${secretOrRepo}/secrets/${secret}`);
   }
 
   // Registry endpoints
-  async listRegistries(owner: string, repo: string): Promise<unknown[]> {
-    return this.request('GET', `/repos/${owner}/${repo}/registry`);
+  async listRegistries(repoId: number): Promise<unknown[]>;
+  async listRegistries(owner: string, repo: string): Promise<unknown[]>;
+  async listRegistries(repoIdOrOwner: number | string, repo?: string): Promise<unknown[]> {
+    if (typeof repoIdOrOwner === 'number') {
+      return this.request('GET', `/repos/${repoIdOrOwner}/registry`);
+    }
+    return this.request('GET', `/repos/${repoIdOrOwner}/${repo}/registry`);
   }
 
-  async getRegistry(
-    owner: string,
-    repo: string,
-    registry: string
-  ): Promise<unknown> {
-    return this.request('GET', `/repos/${owner}/${repo}/registry/${registry}`);
+  async getRegistry(repoId: number, registry: string): Promise<unknown>;
+  async getRegistry(owner: string, repo: string, registry: string): Promise<unknown>;
+  async getRegistry(repoIdOrOwner: number | string, registryOrRepo: string, registry?: string): Promise<unknown> {
+    if (typeof repoIdOrOwner === 'number') {
+      return this.request('GET', `/repos/${repoIdOrOwner}/registry/${registryOrRepo}`);
+    }
+    return this.request('GET', `/repos/${repoIdOrOwner}/${registryOrRepo}/registry/${registry}`);
   }
 
-  async createRegistry(
-    owner: string,
-    repo: string,
-    data: unknown
-  ): Promise<unknown> {
-    return this.request('POST', `/repos/${owner}/${repo}/registry`, data);
+  async createRegistry(repoId: number, data: unknown): Promise<unknown>;
+  async createRegistry(owner: string, repo: string, data: unknown): Promise<unknown>;
+  async createRegistry(repoIdOrOwner: number | string, dataOrRepo: unknown, data?: unknown): Promise<unknown> {
+    if (typeof repoIdOrOwner === 'number') {
+      return this.request('POST', `/repos/${repoIdOrOwner}/registry`, dataOrRepo);
+    }
+    return this.request('POST', `/repos/${repoIdOrOwner}/${dataOrRepo}/registry`, data);
   }
 
-  async deleteRegistry(
-    owner: string,
-    repo: string,
-    registry: string
-  ): Promise<void> {
-    return this.request(
-      'DELETE',
-      `/repos/${owner}/${repo}/registry/${registry}`
-    );
+  async deleteRegistry(repoId: number, registry: string): Promise<void>;
+  async deleteRegistry(owner: string, repo: string, registry: string): Promise<void>;
+  async deleteRegistry(repoIdOrOwner: number | string, registryOrRepo: string, registry?: string): Promise<void> {
+    if (typeof repoIdOrOwner === 'number') {
+      return this.request('DELETE', `/repos/${repoIdOrOwner}/registry/${registryOrRepo}`);
+    }
+    return this.request('DELETE', `/repos/${repoIdOrOwner}/${registryOrRepo}/registry/${registry}`);
   }
 
   // Cron endpoints
-  async listCrons(owner: string, repo: string): Promise<unknown[]> {
-    return this.request('GET', `/repos/${owner}/${repo}/crons`);
+  async listCrons(repoId: number): Promise<unknown[]>;
+  async listCrons(owner: string, repo: string): Promise<unknown[]>;
+  async listCrons(repoIdOrOwner: number | string, repo?: string): Promise<unknown[]> {
+    if (typeof repoIdOrOwner === 'number') {
+      return this.request('GET', `/repos/${repoIdOrOwner}/crons`);
+    }
+    return this.request('GET', `/repos/${repoIdOrOwner}/${repo}/crons`);
   }
 
-  async getCron(
-    owner: string,
-    repo: string,
-    cron: number
-  ): Promise<unknown> {
-    return this.request('GET', `/repos/${owner}/${repo}/crons/${cron}`);
+  async getCron(repoId: number, cron: number): Promise<unknown>;
+  async getCron(owner: string, repo: string, cron: number): Promise<unknown>;
+  async getCron(repoIdOrOwner: number | string, cronOrRepo: number | string, cron?: number): Promise<unknown> {
+    if (typeof repoIdOrOwner === 'number') {
+      return this.request('GET', `/repos/${repoIdOrOwner}/crons/${cronOrRepo}`);
+    }
+    return this.request('GET', `/repos/${repoIdOrOwner}/${cronOrRepo}/crons/${cron}`);
   }
 
-  async createCron(
-    owner: string,
-    repo: string,
+  async createCron(repoId: number, data: unknown): Promise<unknown>;
+  async createCron(owner: string, repo: string, data: unknown): Promise<unknown>;
+  async createCron(repoIdOrOwner: number | string, dataOrRepo: unknown, data?: unknown): Promise<unknown> {
+    if (typeof repoIdOrOwner === 'number') {
+      return this.request('POST', `/repos/${repoIdOrOwner}/crons`, dataOrRepo);
+    }
+    return this.request('POST', `/repos/${repoIdOrOwner}/${dataOrRepo}/crons`, data);
+  }
+
+  async updateCron(
+    repoId: number,
+    cron: number,
     data: unknown
-  ): Promise<unknown> {
-    return this.request('POST', `/repos/${owner}/${repo}/crons`, data);
-  }
-
+  ): Promise<unknown>;
   async updateCron(
     owner: string,
     repo: string,
     cron: number,
     data: unknown
+  ): Promise<unknown>;
+  async updateCron(
+    repoIdOrOwner: number | string,
+    cronOrRepo: number | string,
+    dataOrCron: number | unknown,
+    data?: unknown
   ): Promise<unknown> {
-    return this.request('PATCH', `/repos/${owner}/${repo}/crons/${cron}`, data);
+    if (typeof repoIdOrOwner === 'number') {
+      return this.request('PATCH', `/repos/${repoIdOrOwner}/crons/${cronOrRepo}`, dataOrCron);
+    }
+    return this.request('PATCH', `/repos/${repoIdOrOwner}/${cronOrRepo}/crons/${dataOrCron}`, data);
   }
 
-  async deleteCron(
-    owner: string,
-    repo: string,
-    cron: number
-  ): Promise<void> {
-    return this.request('DELETE', `/repos/${owner}/${repo}/crons/${cron}`);
+  async deleteCron(repoId: number, cron: number): Promise<void>;
+  async deleteCron(owner: string, repo: string, cron: number): Promise<void>;
+  async deleteCron(repoIdOrOwner: number | string, cronOrRepo: number | string, cron?: number): Promise<void> {
+    if (typeof repoIdOrOwner === 'number') {
+      return this.request('DELETE', `/repos/${repoIdOrOwner}/crons/${cronOrRepo}`);
+    }
+    return this.request('DELETE', `/repos/${repoIdOrOwner}/${cronOrRepo}/crons/${cron}`);
   }
 
   // Organization secrets

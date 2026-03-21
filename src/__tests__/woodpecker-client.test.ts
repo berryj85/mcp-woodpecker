@@ -3,6 +3,40 @@ import { WoodpeckerClient } from '../woodpecker-client';
 // Mock fetch globally
 global.fetch = jest.fn();
 
+// Helper to create mock fetch responses with complete Response interface
+function createMockResponse<T>(data: T, options: { ok?: boolean; status?: number; statusText?: string } = {}) {
+  const { ok = true, status = 200, statusText } = options;
+  
+  // Default status text based on status code
+  const defaultStatusText = ok ? 'OK' : getStatusText(status);
+  
+  return {
+    ok,
+    status,
+    statusText: statusText || defaultStatusText,
+    headers: {
+      get: (name: string) => {
+        if (name === 'content-type') return 'application/json';
+        if (name === 'content-length') return JSON.stringify(data).length.toString();
+        return null;
+      },
+    },
+    json: () => Promise.resolve(data),
+    text: () => Promise.resolve(JSON.stringify(data)),
+  };
+}
+
+function getStatusText(status: number): string {
+  const statusTexts: Record<number, string> = {
+    400: 'Bad Request',
+    401: 'Unauthorized',
+    403: 'Forbidden',
+    404: 'Not Found',
+    500: 'Internal Server Error',
+  };
+  return statusTexts[status] || 'Error';
+}
+
 describe('WoodpeckerClient', () => {
   const mockFetch = global.fetch as jest.Mock;
   const baseUrl = 'https://woodpecker.example.com';
@@ -24,10 +58,7 @@ describe('WoodpeckerClient', () => {
         token,
       });
       // We can verify this by checking the request is made correctly
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve([]),
-      });
+      mockFetch.mockResolvedValueOnce(createMockResponse([]));
 
       client.listRepositories();
       expect(mockFetch).toHaveBeenCalledWith(
@@ -40,10 +71,7 @@ describe('WoodpeckerClient', () => {
   describe('request headers', () => {
     it('should include authorization header', async () => {
       const client = new WoodpeckerClient({ baseUrl, token });
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve({}),
-      });
+      mockFetch.mockResolvedValueOnce(createMockResponse({}));
 
       await client.getCurrentUser();
 
@@ -54,10 +82,7 @@ describe('WoodpeckerClient', () => {
 
     it('should include content-type header', async () => {
       const client = new WoodpeckerClient({ baseUrl, token });
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve({}),
-      });
+      mockFetch.mockResolvedValueOnce(createMockResponse({}));
 
       await client.getCurrentUser();
 
@@ -70,12 +95,7 @@ describe('WoodpeckerClient', () => {
   describe('error handling', () => {
     it('should throw error on API failure', async () => {
       const client = new WoodpeckerClient({ baseUrl, token });
-      mockFetch.mockResolvedValueOnce({
-        ok: false,
-        status: 401,
-        statusText: 'Unauthorized',
-        text: () => Promise.resolve('Invalid token'),
-      });
+      mockFetch.mockResolvedValueOnce(createMockResponse(null, { ok: false, status: 401 }));
 
       await expect(client.getCurrentUser()).rejects.toThrow(
         'Woodpecker API error: 401 Unauthorized'
@@ -105,10 +125,7 @@ describe('WoodpeckerClient', () => {
 
     it('should list repositories', async () => {
       const mockRepos = [{ id: 1, name: 'repo1' }];
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve(mockRepos),
-      });
+      mockFetch.mockResolvedValueOnce(createMockResponse(mockRepos));
 
       const result = await client.listRepositories();
 
@@ -121,10 +138,7 @@ describe('WoodpeckerClient', () => {
 
     it('should get a specific repository', async () => {
       const mockRepo = { id: 1, name: 'repo1', owner: 'user1' };
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve(mockRepo),
-      });
+      mockFetch.mockResolvedValueOnce(createMockResponse(mockRepo));
 
       const result = await client.getRepository('user1', 'repo1');
 
@@ -137,10 +151,7 @@ describe('WoodpeckerClient', () => {
 
     it('should activate a repository', async () => {
       const mockRepo = { id: 1, active: true };
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve(mockRepo),
-      });
+      mockFetch.mockResolvedValueOnce(createMockResponse(mockRepo));
 
       const result = await client.activateRepository('user1', 'repo1');
 
@@ -154,10 +165,7 @@ describe('WoodpeckerClient', () => {
     it('should update a repository', async () => {
       const updateData = { is_trusted: true };
       const mockRepo = { id: 1, is_trusted: true };
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve(mockRepo),
-      });
+      mockFetch.mockResolvedValueOnce(createMockResponse(mockRepo));
 
       const result = await client.updateRepository('user1', 'repo1', updateData);
 
@@ -172,10 +180,7 @@ describe('WoodpeckerClient', () => {
     });
 
     it('should delete a repository', async () => {
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve(null),
-      });
+      mockFetch.mockResolvedValueOnce(createMockResponse(null));
 
       await client.deleteRepository('user1', 'repo1');
 
@@ -187,10 +192,7 @@ describe('WoodpeckerClient', () => {
 
     it('should repair repositories', async () => {
       const mockResult = { message: 'Repair completed' };
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve(mockResult),
-      });
+      mockFetch.mockResolvedValueOnce(createMockResponse(mockResult));
 
       const result = await client.repairRepositories();
 
@@ -211,10 +213,7 @@ describe('WoodpeckerClient', () => {
 
     it('should list pipelines', async () => {
       const mockPipelines = [{ id: 1, number: 1, status: 'success' }];
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve(mockPipelines),
-      });
+      mockFetch.mockResolvedValueOnce(createMockResponse(mockPipelines));
 
       const result = await client.listPipelines('user1', 'repo1');
 
@@ -227,10 +226,7 @@ describe('WoodpeckerClient', () => {
 
     it('should list pipelines with branch filter', async () => {
       const mockPipelines = [{ id: 1, branch: 'main' }];
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve(mockPipelines),
-      });
+      mockFetch.mockResolvedValueOnce(createMockResponse(mockPipelines));
 
       await client.listPipelines('user1', 'repo1', { branch: 'main' });
 
@@ -242,10 +238,7 @@ describe('WoodpeckerClient', () => {
 
     it('should list pipelines with status filter', async () => {
       const mockPipelines = [{ id: 1, status: 'success' }];
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve(mockPipelines),
-      });
+      mockFetch.mockResolvedValueOnce(createMockResponse(mockPipelines));
 
       await client.listPipelines('user1', 'repo1', { status: 'success' });
 
@@ -257,10 +250,7 @@ describe('WoodpeckerClient', () => {
 
     it('should list pipelines with multiple filters', async () => {
       const mockPipelines: unknown[] = [];
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve(mockPipelines),
-      });
+      mockFetch.mockResolvedValueOnce(createMockResponse(mockPipelines));
 
       await client.listPipelines('user1', 'repo1', {
         branch: 'develop',
@@ -279,10 +269,7 @@ describe('WoodpeckerClient', () => {
 
     it('should get a specific pipeline', async () => {
       const mockPipeline = { id: 1, number: 1, status: 'success' };
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve(mockPipeline),
-      });
+      mockFetch.mockResolvedValueOnce(createMockResponse(mockPipeline));
 
       const result = await client.getPipeline('user1', 'repo1', 1);
 
@@ -296,10 +283,7 @@ describe('WoodpeckerClient', () => {
     it('should create a pipeline', async () => {
       const createData = { branch: 'main' };
       const mockPipeline = { id: 1, number: 1, status: 'pending' };
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve(mockPipeline),
-      });
+      mockFetch.mockResolvedValueOnce(createMockResponse(mockPipeline));
 
       const result = await client.createPipeline('user1', 'repo1', createData);
 
@@ -314,10 +298,7 @@ describe('WoodpeckerClient', () => {
     });
 
     it('should cancel a pipeline', async () => {
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve(null),
-      });
+      mockFetch.mockResolvedValueOnce(createMockResponse(null));
 
       await client.cancelPipeline('user1', 'repo1', 1);
 
@@ -329,10 +310,7 @@ describe('WoodpeckerClient', () => {
 
     it('should get pipeline status', async () => {
       const mockStatus = { status: 'success' };
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve(mockStatus),
-      });
+      mockFetch.mockResolvedValueOnce(createMockResponse(mockStatus));
 
       const result = await client.getPipelineStatus('user1', 'repo1', 1);
 
@@ -345,10 +323,7 @@ describe('WoodpeckerClient', () => {
 
     it('should get step logs', async () => {
       const mockLogs = { logs: 'step output' };
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve(mockLogs),
-      });
+      mockFetch.mockResolvedValueOnce(createMockResponse(mockLogs));
 
       const result = await client.getStepLogs('user1', 'repo1', 1, 1);
 
@@ -360,10 +335,7 @@ describe('WoodpeckerClient', () => {
     });
 
     it('should delete pipeline logs', async () => {
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve(null),
-      });
+      mockFetch.mockResolvedValueOnce(createMockResponse(null));
 
       await client.deletePipelineLogs('user1', 'repo1', 1);
 
@@ -383,10 +355,7 @@ describe('WoodpeckerClient', () => {
 
     it('should list secrets', async () => {
       const mockSecrets = [{ id: 1, name: 'API_KEY' }];
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve(mockSecrets),
-      });
+      mockFetch.mockResolvedValueOnce(createMockResponse(mockSecrets));
 
       const result = await client.listSecrets('user1', 'repo1');
 
@@ -399,10 +368,7 @@ describe('WoodpeckerClient', () => {
 
     it('should get a specific secret', async () => {
       const mockSecret = { id: 1, name: 'API_KEY' };
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve(mockSecret),
-      });
+      mockFetch.mockResolvedValueOnce(createMockResponse(mockSecret));
 
       const result = await client.getSecret('user1', 'repo1', 'API_KEY');
 
@@ -416,10 +382,7 @@ describe('WoodpeckerClient', () => {
     it('should create a secret', async () => {
       const secretData = { name: 'API_KEY', value: 'secret123' };
       const mockSecret = { id: 1, ...secretData };
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve(mockSecret),
-      });
+      mockFetch.mockResolvedValueOnce(createMockResponse(mockSecret));
 
       const result = await client.createSecret('user1', 'repo1', secretData);
 
@@ -436,10 +399,7 @@ describe('WoodpeckerClient', () => {
     it('should update a secret', async () => {
       const updateData = { value: 'newsecret' };
       const mockSecret = { id: 1, name: 'API_KEY', ...updateData };
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve(mockSecret),
-      });
+      mockFetch.mockResolvedValueOnce(createMockResponse(mockSecret));
 
       const result = await client.updateSecret(
         'user1',
@@ -459,10 +419,7 @@ describe('WoodpeckerClient', () => {
     });
 
     it('should delete a secret', async () => {
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve(null),
-      });
+      mockFetch.mockResolvedValueOnce(createMockResponse(null));
 
       await client.deleteSecret('user1', 'repo1', 'API_KEY');
 
@@ -482,10 +439,7 @@ describe('WoodpeckerClient', () => {
 
     it('should list registries', async () => {
       const mockRegistries = [{ id: 1, address: 'docker.io' }];
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve(mockRegistries),
-      });
+      mockFetch.mockResolvedValueOnce(createMockResponse(mockRegistries));
 
       const result = await client.listRegistries('user1', 'repo1');
 
@@ -498,10 +452,7 @@ describe('WoodpeckerClient', () => {
 
     it('should get a specific registry', async () => {
       const mockRegistry = { id: 1, address: 'docker.io' };
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve(mockRegistry),
-      });
+      mockFetch.mockResolvedValueOnce(createMockResponse(mockRegistry));
 
       const result = await client.getRegistry('user1', 'repo1', 'docker.io');
 
@@ -515,10 +466,7 @@ describe('WoodpeckerClient', () => {
     it('should create a registry', async () => {
       const registryData = { address: 'docker.io', username: 'user' };
       const mockRegistry = { id: 1, ...registryData };
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve(mockRegistry),
-      });
+      mockFetch.mockResolvedValueOnce(createMockResponse(mockRegistry));
 
       const result = await client.createRegistry('user1', 'repo1', registryData);
 
@@ -533,10 +481,7 @@ describe('WoodpeckerClient', () => {
     });
 
     it('should delete a registry', async () => {
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve(null),
-      });
+      mockFetch.mockResolvedValueOnce(createMockResponse(null));
 
       await client.deleteRegistry('user1', 'repo1', 'docker.io');
 
@@ -556,10 +501,7 @@ describe('WoodpeckerClient', () => {
 
     it('should list crons', async () => {
       const mockCrons = [{ id: 1, name: 'daily' }];
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve(mockCrons),
-      });
+      mockFetch.mockResolvedValueOnce(createMockResponse(mockCrons));
 
       const result = await client.listCrons('user1', 'repo1');
 
@@ -572,10 +514,7 @@ describe('WoodpeckerClient', () => {
 
     it('should get a specific cron', async () => {
       const mockCron = { id: 1, name: 'daily', schedule: '0 0 * * *' };
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve(mockCron),
-      });
+      mockFetch.mockResolvedValueOnce(createMockResponse(mockCron));
 
       const result = await client.getCron('user1', 'repo1', 1);
 
@@ -589,10 +528,7 @@ describe('WoodpeckerClient', () => {
     it('should create a cron', async () => {
       const cronData = { name: 'daily', schedule: '0 0 * * *' };
       const mockCron = { id: 1, ...cronData };
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve(mockCron),
-      });
+      mockFetch.mockResolvedValueOnce(createMockResponse(mockCron));
 
       const result = await client.createCron('user1', 'repo1', cronData);
 
@@ -609,10 +545,7 @@ describe('WoodpeckerClient', () => {
     it('should update a cron', async () => {
       const updateData = { schedule: '0 0 * * 0' };
       const mockCron = { id: 1, name: 'weekly', ...updateData };
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve(mockCron),
-      });
+      mockFetch.mockResolvedValueOnce(createMockResponse(mockCron));
 
       const result = await client.updateCron('user1', 'repo1', 1, updateData);
 
@@ -627,10 +560,7 @@ describe('WoodpeckerClient', () => {
     });
 
     it('should delete a cron', async () => {
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve(null),
-      });
+      mockFetch.mockResolvedValueOnce(createMockResponse(null));
 
       await client.deleteCron('user1', 'repo1', 1);
 
@@ -650,10 +580,7 @@ describe('WoodpeckerClient', () => {
 
     it('should list organization secrets', async () => {
       const mockSecrets = [{ id: 1, name: 'ORG_KEY' }];
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve(mockSecrets),
-      });
+      mockFetch.mockResolvedValueOnce(createMockResponse(mockSecrets));
 
       const result = await client.listOrgSecrets('org1');
 
@@ -666,10 +593,7 @@ describe('WoodpeckerClient', () => {
 
     it('should get a specific organization secret', async () => {
       const mockSecret = { id: 1, name: 'ORG_KEY' };
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve(mockSecret),
-      });
+      mockFetch.mockResolvedValueOnce(createMockResponse(mockSecret));
 
       const result = await client.getOrgSecret('org1', 'ORG_KEY');
 
@@ -683,10 +607,7 @@ describe('WoodpeckerClient', () => {
     it('should create an organization secret', async () => {
       const secretData = { name: 'ORG_KEY', value: 'secret123' };
       const mockSecret = { id: 1, ...secretData };
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve(mockSecret),
-      });
+      mockFetch.mockResolvedValueOnce(createMockResponse(mockSecret));
 
       const result = await client.createOrgSecret('org1', secretData);
 
@@ -703,10 +624,7 @@ describe('WoodpeckerClient', () => {
     it('should update an organization secret', async () => {
       const updateData = { value: 'newsecret' };
       const mockSecret = { id: 1, name: 'ORG_KEY', ...updateData };
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve(mockSecret),
-      });
+      mockFetch.mockResolvedValueOnce(createMockResponse(mockSecret));
 
       const result = await client.updateOrgSecret('org1', 'ORG_KEY', updateData);
 
@@ -721,10 +639,7 @@ describe('WoodpeckerClient', () => {
     });
 
     it('should delete an organization secret', async () => {
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve(null),
-      });
+      mockFetch.mockResolvedValueOnce(createMockResponse(null));
 
       await client.deleteOrgSecret('org1', 'ORG_KEY');
 
@@ -744,10 +659,7 @@ describe('WoodpeckerClient', () => {
 
     it('should get current user', async () => {
       const mockUser = { id: 1, name: 'testuser', login: 'testuser' };
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve(mockUser),
-      });
+      mockFetch.mockResolvedValueOnce(createMockResponse(mockUser));
 
       const result = await client.getCurrentUser();
 
@@ -760,10 +672,7 @@ describe('WoodpeckerClient', () => {
 
     it('should get server info', async () => {
       const mockVersion = { version: '1.0.0' };
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve(mockVersion),
-      });
+      mockFetch.mockResolvedValueOnce(createMockResponse(mockVersion));
 
       const result = await client.getServerInfo();
 

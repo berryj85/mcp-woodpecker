@@ -58,16 +58,12 @@ const tools: Tool[] = [
     inputSchema: {
       type: 'object',
       properties: {
-        owner: {
-          type: 'string',
-          description: 'Repository owner/organization',
-        },
-        repo: {
-          type: 'string',
-          description: 'Repository name',
+        repoId: {
+          type: 'number',
+          description: 'Repository ID',
         },
       },
-      required: ['owner', 'repo'],
+      required: ['repoId'],
     },
   },
   {
@@ -76,16 +72,12 @@ const tools: Tool[] = [
     inputSchema: {
       type: 'object',
       properties: {
-        owner: {
-          type: 'string',
-          description: 'Repository owner/organization',
-        },
-        repo: {
-          type: 'string',
-          description: 'Repository name',
+        repoId: {
+          type: 'number',
+          description: 'Repository ID',
         },
       },
-      required: ['owner', 'repo'],
+      required: ['repoId'],
     },
   },
   {
@@ -116,7 +108,7 @@ const tools: Tool[] = [
           description: 'Path to the .woodpecker.yml file',
         },
       },
-      required: ['owner', 'repo'],
+      required: ['repoId'],
     },
   },
   {
@@ -125,16 +117,12 @@ const tools: Tool[] = [
     inputSchema: {
       type: 'object',
       properties: {
-        owner: {
-          type: 'string',
-          description: 'Repository owner/organization',
-        },
-        repo: {
-          type: 'string',
-          description: 'Repository name',
+        repoId: {
+          type: 'number',
+          description: 'Repository ID',
         },
       },
-      required: ['owner', 'repo'],
+      required: ['repoId'],
     },
   },
 
@@ -146,13 +134,9 @@ const tools: Tool[] = [
     inputSchema: {
       type: 'object',
       properties: {
-        owner: {
-          type: 'string',
-          description: 'Repository owner/organization',
-        },
-        repo: {
-          type: 'string',
-          description: 'Repository name',
+        repoId: {
+          type: 'number',
+          description: 'Repository ID',
         },
         branch: {
           type: 'string',
@@ -164,7 +148,7 @@ const tools: Tool[] = [
           description: 'Filter by pipeline status (optional)',
         },
       },
-      required: ['owner', 'repo'],
+      required: ['repoId'],
     },
   },
   {
@@ -173,20 +157,16 @@ const tools: Tool[] = [
     inputSchema: {
       type: 'object',
       properties: {
-        owner: {
-          type: 'string',
-          description: 'Repository owner/organization',
-        },
-        repo: {
-          type: 'string',
-          description: 'Repository name',
+        repoId: {
+          type: 'number',
+          description: 'Repository ID',
         },
         number: {
           type: 'number',
           description: 'Pipeline number',
         },
       },
-      required: ['owner', 'repo', 'number'],
+      required: ['repoId', 'number'],
     },
   },
   {
@@ -195,20 +175,16 @@ const tools: Tool[] = [
     inputSchema: {
       type: 'object',
       properties: {
-        owner: {
-          type: 'string',
-          description: 'Repository owner/organization',
-        },
-        repo: {
-          type: 'string',
-          description: 'Repository name',
+        repoId: {
+          type: 'number',
+          description: 'Repository ID',
         },
         number: {
           type: 'number',
           description: 'Pipeline number',
         },
       },
-      required: ['owner', 'repo', 'number'],
+      required: ['repoId', 'number'],
     },
   },
   {
@@ -217,13 +193,9 @@ const tools: Tool[] = [
     inputSchema: {
       type: 'object',
       properties: {
-        owner: {
-          type: 'string',
-          description: 'Repository owner/organization',
-        },
-        repo: {
-          type: 'string',
-          description: 'Repository name',
+        repoId: {
+          type: 'number',
+          description: 'Repository ID',
         },
         branch: {
           type: 'string',
@@ -234,7 +206,7 @@ const tools: Tool[] = [
           description: 'Environment variables for the pipeline',
         },
       },
-      required: ['owner', 'repo', 'branch'],
+      required: ['repoId', 'branch'],
     },
   },
   {
@@ -243,20 +215,16 @@ const tools: Tool[] = [
     inputSchema: {
       type: 'object',
       properties: {
-        owner: {
-          type: 'string',
-          description: 'Repository owner/organization',
-        },
-        repo: {
-          type: 'string',
-          description: 'Repository name',
+        repoId: {
+          type: 'number',
+          description: 'Repository ID',
         },
         number: {
           type: 'number',
           description: 'Pipeline number',
         },
       },
-      required: ['owner', 'repo', 'number'],
+      required: ['repoId', 'number'],
     },
   },
   {
@@ -265,13 +233,9 @@ const tools: Tool[] = [
     inputSchema: {
       type: 'object',
       properties: {
-        owner: {
-          type: 'string',
-          description: 'Repository owner/organization',
-        },
-        repo: {
-          type: 'string',
-          description: 'Repository name',
+        repoId: {
+          type: 'number',
+          description: 'Repository ID',
         },
         number: {
           type: 'number',
@@ -282,7 +246,7 @@ const tools: Tool[] = [
           description: 'Step number',
         },
       },
-      required: ['owner', 'repo', 'number', 'step'],
+      required: ['repoId', 'number', 'step'],
     },
   },
   {
@@ -291,20 +255,16 @@ const tools: Tool[] = [
     inputSchema: {
       type: 'object',
       properties: {
-        owner: {
-          type: 'string',
-          description: 'Repository owner/organization',
-        },
-        repo: {
-          type: 'string',
-          description: 'Repository name',
+        repoId: {
+          type: 'number',
+          description: 'Repository ID',
         },
         number: {
           type: 'number',
           description: 'Pipeline number',
         },
       },
-      required: ['owner', 'repo', 'number'],
+      required: ['repoId', 'number'],
     },
   },
 
@@ -315,16 +275,12 @@ const tools: Tool[] = [
     inputSchema: {
       type: 'object',
       properties: {
-        owner: {
-          type: 'string',
-          description: 'Repository owner/organization',
-        },
-        repo: {
-          type: 'string',
-          description: 'Repository name',
+        repoId: {
+          type: 'number',
+          description: 'Repository ID',
         },
       },
-      required: ['owner', 'repo'],
+      required: ['repoId'],
     },
   },
   {
@@ -333,20 +289,16 @@ const tools: Tool[] = [
     inputSchema: {
       type: 'object',
       properties: {
-        owner: {
-          type: 'string',
-          description: 'Repository owner/organization',
-        },
-        repo: {
-          type: 'string',
-          description: 'Repository name',
+        repoId: {
+          type: 'number',
+          description: 'Repository ID',
         },
         secret: {
           type: 'string',
           description: 'Secret name',
         },
       },
-      required: ['owner', 'repo', 'secret'],
+      required: ['repoId', 'secret'],
     },
   },
   {
@@ -355,13 +307,9 @@ const tools: Tool[] = [
     inputSchema: {
       type: 'object',
       properties: {
-        owner: {
-          type: 'string',
-          description: 'Repository owner/organization',
-        },
-        repo: {
-          type: 'string',
-          description: 'Repository name',
+        repoId: {
+          type: 'number',
+          description: 'Repository ID',
         },
         name: {
           type: 'string',
@@ -378,7 +326,7 @@ const tools: Tool[] = [
             'Events that trigger this secret (push, pull_request, tag, deployment, cron)',
         },
       },
-      required: ['owner', 'repo', 'name', 'value'],
+      required: ['repoId', 'name', 'value'],
     },
   },
   {
@@ -387,13 +335,9 @@ const tools: Tool[] = [
     inputSchema: {
       type: 'object',
       properties: {
-        owner: {
-          type: 'string',
-          description: 'Repository owner/organization',
-        },
-        repo: {
-          type: 'string',
-          description: 'Repository name',
+        repoId: {
+          type: 'number',
+          description: 'Repository ID',
         },
         secret: {
           type: 'string',
@@ -409,7 +353,7 @@ const tools: Tool[] = [
           description: 'Events that trigger this secret',
         },
       },
-      required: ['owner', 'repo', 'secret'],
+      required: ['repoId', 'secret'],
     },
   },
   {
@@ -418,20 +362,16 @@ const tools: Tool[] = [
     inputSchema: {
       type: 'object',
       properties: {
-        owner: {
-          type: 'string',
-          description: 'Repository owner/organization',
-        },
-        repo: {
-          type: 'string',
-          description: 'Repository name',
+        repoId: {
+          type: 'number',
+          description: 'Repository ID',
         },
         secret: {
           type: 'string',
           description: 'Secret name',
         },
       },
-      required: ['owner', 'repo', 'secret'],
+      required: ['repoId', 'secret'],
     },
   },
 
@@ -442,16 +382,12 @@ const tools: Tool[] = [
     inputSchema: {
       type: 'object',
       properties: {
-        owner: {
-          type: 'string',
-          description: 'Repository owner/organization',
-        },
-        repo: {
-          type: 'string',
-          description: 'Repository name',
+        repoId: {
+          type: 'number',
+          description: 'Repository ID',
         },
       },
-      required: ['owner', 'repo'],
+      required: ['repoId'],
     },
   },
   {
@@ -460,20 +396,16 @@ const tools: Tool[] = [
     inputSchema: {
       type: 'object',
       properties: {
-        owner: {
-          type: 'string',
-          description: 'Repository owner/organization',
-        },
-        repo: {
-          type: 'string',
-          description: 'Repository name',
+        repoId: {
+          type: 'number',
+          description: 'Repository ID',
         },
         registry: {
           type: 'string',
           description: 'Registry address/hostname',
         },
       },
-      required: ['owner', 'repo', 'registry'],
+      required: ['repoId', 'registry'],
     },
   },
   {
@@ -482,13 +414,9 @@ const tools: Tool[] = [
     inputSchema: {
       type: 'object',
       properties: {
-        owner: {
-          type: 'string',
-          description: 'Repository owner/organization',
-        },
-        repo: {
-          type: 'string',
-          description: 'Repository name',
+        repoId: {
+          type: 'number',
+          description: 'Repository ID',
         },
         address: {
           type: 'string',
@@ -503,7 +431,7 @@ const tools: Tool[] = [
           description: 'Registry password/token',
         },
       },
-      required: ['owner', 'repo', 'address', 'username', 'password'],
+      required: ['repoId', 'address', 'username', 'password'],
     },
   },
   {
@@ -512,20 +440,16 @@ const tools: Tool[] = [
     inputSchema: {
       type: 'object',
       properties: {
-        owner: {
-          type: 'string',
-          description: 'Repository owner/organization',
-        },
-        repo: {
-          type: 'string',
-          description: 'Repository name',
+        repoId: {
+          type: 'number',
+          description: 'Repository ID',
         },
         registry: {
           type: 'string',
           description: 'Registry address/hostname',
         },
       },
-      required: ['owner', 'repo', 'registry'],
+      required: ['repoId', 'registry'],
     },
   },
 
@@ -536,16 +460,12 @@ const tools: Tool[] = [
     inputSchema: {
       type: 'object',
       properties: {
-        owner: {
-          type: 'string',
-          description: 'Repository owner/organization',
-        },
-        repo: {
-          type: 'string',
-          description: 'Repository name',
+        repoId: {
+          type: 'number',
+          description: 'Repository ID',
         },
       },
-      required: ['owner', 'repo'],
+      required: ['repoId'],
     },
   },
   {
@@ -554,20 +474,16 @@ const tools: Tool[] = [
     inputSchema: {
       type: 'object',
       properties: {
-        owner: {
-          type: 'string',
-          description: 'Repository owner/organization',
-        },
-        repo: {
-          type: 'string',
-          description: 'Repository name',
+        repoId: {
+          type: 'number',
+          description: 'Repository ID',
         },
         cron: {
           type: 'number',
           description: 'Cron job ID',
         },
       },
-      required: ['owner', 'repo', 'cron'],
+      required: ['repoId', 'cron'],
     },
   },
   {
@@ -576,13 +492,9 @@ const tools: Tool[] = [
     inputSchema: {
       type: 'object',
       properties: {
-        owner: {
-          type: 'string',
-          description: 'Repository owner/organization',
-        },
-        repo: {
-          type: 'string',
-          description: 'Repository name',
+        repoId: {
+          type: 'number',
+          description: 'Repository ID',
         },
         name: {
           type: 'string',
@@ -597,7 +509,7 @@ const tools: Tool[] = [
           description: 'Branch to run the cron job on',
         },
       },
-      required: ['owner', 'repo', 'name', 'expr', 'branch'],
+      required: ['repoId', 'name', 'expr', 'branch'],
     },
   },
   {
@@ -606,13 +518,9 @@ const tools: Tool[] = [
     inputSchema: {
       type: 'object',
       properties: {
-        owner: {
-          type: 'string',
-          description: 'Repository owner/organization',
-        },
-        repo: {
-          type: 'string',
-          description: 'Repository name',
+        repoId: {
+          type: 'number',
+          description: 'Repository ID',
         },
         cron: {
           type: 'number',
@@ -631,7 +539,7 @@ const tools: Tool[] = [
           description: 'Branch to run on',
         },
       },
-      required: ['owner', 'repo', 'cron'],
+      required: ['repoId', 'cron'],
     },
   },
   {
@@ -640,20 +548,16 @@ const tools: Tool[] = [
     inputSchema: {
       type: 'object',
       properties: {
-        owner: {
-          type: 'string',
-          description: 'Repository owner/organization',
-        },
-        repo: {
-          type: 'string',
-          description: 'Repository name',
+        repoId: {
+          type: 'number',
+          description: 'Repository ID',
         },
         cron: {
           type: 'number',
           description: 'Cron job ID',
         },
       },
-      required: ['owner', 'repo', 'cron'],
+      required: ['repoId', 'cron'],
     },
   },
 
@@ -789,83 +693,57 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
     if (toolName === 'list_repositories') {
       result = await client.listRepositories();
     } else if (toolName === 'get_repository') {
-      result = await client.getRepository(
-        toolInput.owner as string,
-        toolInput.repo as string
-      );
+      result = await client.getRepository(toolInput.repoId as number);
     } else if (toolName === 'activate_repository') {
-      result = await client.activateRepository(
-        toolInput.owner as string,
-        toolInput.repo as string
-      );
+      result = await client.activateRepository(toolInput.repoId as number);
     } else if (toolName === 'update_repository') {
       const data: Record<string, unknown> = {};
       if (toolInput.is_trusted !== undefined)
         data.is_trusted = toolInput.is_trusted;
       if (toolInput.visibility) data.visibility = toolInput.visibility;
       if (toolInput.config_path) data.config_path = toolInput.config_path;
-      result = await client.updateRepository(
-        toolInput.owner as string,
-        toolInput.repo as string,
-        data
-      );
+      result = await client.updateRepository(toolInput.repoId as number, data);
     } else if (toolName === 'delete_repository') {
-      result = await client.deleteRepository(
-        toolInput.owner as string,
-        toolInput.repo as string
-      );
+      result = await client.deleteRepository(toolInput.repoId as number);
       result = { status: 'Repository deleted successfully' };
     }
 
     // Pipeline operations
     else if (toolName === 'list_pipelines') {
-      result = await client.listPipelines(
-        toolInput.owner as string,
-        toolInput.repo as string,
-        {
-          branch: toolInput.branch as string | undefined,
-          status: toolInput.status as string | undefined,
-        }
-      );
+      result = await client.listPipelines(toolInput.repoId as number, {
+        branch: toolInput.branch as string | undefined,
+        status: toolInput.status as string | undefined,
+      });
     } else if (toolName === 'get_pipeline') {
       result = await client.getPipeline(
-        toolInput.owner as string,
-        toolInput.repo as string,
+        toolInput.repoId as number,
         toolInput.number as number
       );
     } else if (toolName === 'get_pipeline_status') {
       result = await client.getPipelineStatus(
-        toolInput.owner as string,
-        toolInput.repo as string,
+        toolInput.repoId as number,
         toolInput.number as number
       );
     } else if (toolName === 'trigger_pipeline') {
-      result = await client.createPipeline(
-        toolInput.owner as string,
-        toolInput.repo as string,
-        {
-          branch: toolInput.branch,
-          variables: toolInput.variables,
-        }
-      );
+      result = await client.createPipeline(toolInput.repoId as number, {
+        branch: toolInput.branch,
+        variables: toolInput.variables,
+      });
     } else if (toolName === 'cancel_pipeline') {
       result = await client.cancelPipeline(
-        toolInput.owner as string,
-        toolInput.repo as string,
+        toolInput.repoId as number,
         toolInput.number as number
       );
       result = { status: 'Pipeline cancelled successfully' };
     } else if (toolName === 'get_pipeline_logs') {
       result = await client.getStepLogs(
-        toolInput.owner as string,
-        toolInput.repo as string,
+        toolInput.repoId as number,
         toolInput.number as number,
         toolInput.step as number
       );
     } else if (toolName === 'delete_pipeline_logs') {
       result = await client.deletePipelineLogs(
-        toolInput.owner as string,
-        toolInput.repo as string,
+        toolInput.repoId as number,
         toolInput.number as number
       );
       result = { status: 'Pipeline logs deleted successfully' };
@@ -873,40 +751,30 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 
     // Secret operations
     else if (toolName === 'list_secrets') {
-      result = await client.listSecrets(
-        toolInput.owner as string,
-        toolInput.repo as string
-      );
+      result = await client.listSecrets(toolInput.repoId as number);
     } else if (toolName === 'get_secret') {
       result = await client.getSecret(
-        toolInput.owner as string,
-        toolInput.repo as string,
+        toolInput.repoId as number,
         toolInput.secret as string
       );
     } else if (toolName === 'create_secret') {
-      result = await client.createSecret(
-        toolInput.owner as string,
-        toolInput.repo as string,
-        {
-          name: toolInput.name,
-          value: toolInput.value,
-          events: toolInput.events,
-        }
-      );
+      result = await client.createSecret(toolInput.repoId as number, {
+        name: toolInput.name,
+        value: toolInput.value,
+        events: toolInput.events,
+      });
     } else if (toolName === 'update_secret') {
       const secretData: Record<string, unknown> = {};
       if (toolInput.value !== undefined) secretData.value = toolInput.value;
       if (toolInput.events) secretData.events = toolInput.events;
       result = await client.updateSecret(
-        toolInput.owner as string,
-        toolInput.repo as string,
+        toolInput.repoId as number,
         toolInput.secret as string,
         secretData
       );
     } else if (toolName === 'delete_secret') {
       result = await client.deleteSecret(
-        toolInput.owner as string,
-        toolInput.repo as string,
+        toolInput.repoId as number,
         toolInput.secret as string
       );
       result = { status: 'Secret deleted successfully' };
@@ -914,30 +782,21 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 
     // Registry operations
     else if (toolName === 'list_registries') {
-      result = await client.listRegistries(
-        toolInput.owner as string,
-        toolInput.repo as string
-      );
+      result = await client.listRegistries(toolInput.repoId as number);
     } else if (toolName === 'get_registry') {
       result = await client.getRegistry(
-        toolInput.owner as string,
-        toolInput.repo as string,
+        toolInput.repoId as number,
         toolInput.registry as string
       );
     } else if (toolName === 'create_registry') {
-      result = await client.createRegistry(
-        toolInput.owner as string,
-        toolInput.repo as string,
-        {
-          address: toolInput.address,
-          username: toolInput.username,
-          password: toolInput.password,
-        }
-      );
+      result = await client.createRegistry(toolInput.repoId as number, {
+        address: toolInput.address,
+        username: toolInput.username,
+        password: toolInput.password,
+      });
     } else if (toolName === 'delete_registry') {
       result = await client.deleteRegistry(
-        toolInput.owner as string,
-        toolInput.repo as string,
+        toolInput.repoId as number,
         toolInput.registry as string
       );
       result = { status: 'Registry deleted successfully' };
@@ -945,41 +804,31 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 
     // Cron operations
     else if (toolName === 'list_crons') {
-      result = await client.listCrons(
-        toolInput.owner as string,
-        toolInput.repo as string
-      );
+      result = await client.listCrons(toolInput.repoId as number);
     } else if (toolName === 'get_cron') {
       result = await client.getCron(
-        toolInput.owner as string,
-        toolInput.repo as string,
+        toolInput.repoId as number,
         toolInput.cron as number
       );
     } else if (toolName === 'create_cron') {
-      result = await client.createCron(
-        toolInput.owner as string,
-        toolInput.repo as string,
-        {
-          name: toolInput.name,
-          expr: toolInput.expr,
-          branch: toolInput.branch,
-        }
-      );
+      result = await client.createCron(toolInput.repoId as number, {
+        name: toolInput.name,
+        expr: toolInput.expr,
+        branch: toolInput.branch,
+      });
     } else if (toolName === 'update_cron') {
       const cronData: Record<string, unknown> = {};
       if (toolInput.name !== undefined) cronData.name = toolInput.name;
       if (toolInput.expr !== undefined) cronData.expr = toolInput.expr;
       if (toolInput.branch !== undefined) cronData.branch = toolInput.branch;
       result = await client.updateCron(
-        toolInput.owner as string,
-        toolInput.repo as string,
+        toolInput.repoId as number,
         toolInput.cron as number,
         cronData
       );
     } else if (toolName === 'delete_cron') {
       result = await client.deleteCron(
-        toolInput.owner as string,
-        toolInput.repo as string,
+        toolInput.repoId as number,
         toolInput.cron as number
       );
       result = { status: 'Cron job deleted successfully' };

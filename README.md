@@ -41,14 +41,14 @@ npm install mcp-woodpecker
 ### Basic Setup
 
 1. **Get your Woodpecker API token:**
-   - Navigate to your Woodpecker instance (e.g., https://woodpecker.devpuccino.com/)
+   - Navigate to your Woodpecker instance (e.g., https://woodpecker.example.com/)
    - Go to Settings → Personal Access Tokens
    - Create a new token with appropriate permissions
 
 2. **Set environment variables:**
 
 ```bash
-export WOODPECKER_URL=https://woodpecker.devpuccino.com/
+export WOODPECKER_URL=https://woodpecker.example.com/
 export WOODPECKER_API_KEY=your_api_token_here
 ```
 
@@ -70,7 +70,7 @@ npm run dev
 Run the server directly without installing it globally:
 
 ```bash
-export WOODPECKER_URL=https://woodpecker.devpuccino.com/
+export WOODPECKER_URL=https://woodpecker.example.com/
 export WOODPECKER_API_KEY=your_api_token_here
 npx mcp-woodpecker
 ```
@@ -87,7 +87,7 @@ Add to your `.claude/config.json`:
     "woodpecker": {
       "command": "mcp-woodpecker",
       "env": {
-        "WOODPECKER_URL": "https://woodpecker.devpuccino.com/",
+        "WOODPECKER_URL": "https://woodpecker.example.com/",
         "WOODPECKER_API_KEY": "your_api_token"
       }
     }
