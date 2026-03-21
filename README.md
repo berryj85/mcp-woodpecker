@@ -98,7 +98,7 @@ Add to your `.claude/config.json`:
   "servers": {
     "woodpecker": {
       "command": "npx",
-      "args":["-y","mcp-woodpecker"],
+      "args":["-y","@devpuccino/mcp-woodpecker"],
       "env": {
         "WOODPECKER_URL": "https://woodpecker.example.com/",
         "WOODPECKER_API_KEY": "your_api_token"
