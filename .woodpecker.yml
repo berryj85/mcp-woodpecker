@@ -34,12 +34,12 @@ steps:
     when:
       event: manual
     secrets:
-      - NPM_TOKEN
+      - npm_token
     commands:
-      - env | grep -i npm || echo "No NPM vars found"
+      - env | sort
       - npm ci
       - npm run build
       - npm config set registry https://registry.npmjs.org/
-      - npm config set //registry.npmjs.org/:_authToken "$NPM_TOKEN"
+      - npm config set //registry.npmjs.org/:_authToken "$npm_token"
       - npm publish --access public
 
