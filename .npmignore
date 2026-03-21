@@ -13,28 +13,27 @@ tsconfig.json
 # Development and testing
 .env
 .env.*
-!.env.example
+.env.example
 .vscode
 .idea
 *.swp
 *.swo
 *~
 .DS_Store
+example.ts
 
 # CI/CD
 .woodpecker.yml
 .github
 .gitlab-ci.yml
+.claude
 
 # Docker
 Dockerfile
 .dockerignore
 
-# Documentation and config
-README.md
-LICENSE
-
 # Other
 .gitignore
 .git
 .gitattributes
+jest.config.js
