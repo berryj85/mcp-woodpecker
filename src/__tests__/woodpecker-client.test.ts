@@ -444,7 +444,7 @@ describe('WoodpeckerClient', () => {
       const result = await client.listRegistries('user1', 'repo1');
 
       expect(mockFetch).toHaveBeenCalledWith(
-        `${baseUrl}/api/repos/user1/repo1/registry`,
+        `${baseUrl}/api/repos/user1/repo1/registries`,
         expect.objectContaining({ method: 'GET' })
       );
       expect(result).toEqual(mockRegistries);
@@ -457,7 +457,7 @@ describe('WoodpeckerClient', () => {
       const result = await client.getRegistry('user1', 'repo1', 'docker.io');
 
       expect(mockFetch).toHaveBeenCalledWith(
-        `${baseUrl}/api/repos/user1/repo1/registry/docker.io`,
+        `${baseUrl}/api/repos/user1/repo1/registries/docker.io`,
         expect.objectContaining({ method: 'GET' })
       );
       expect(result).toEqual(mockRegistry);
@@ -471,7 +471,7 @@ describe('WoodpeckerClient', () => {
       const result = await client.createRegistry('user1', 'repo1', registryData);
 
       expect(mockFetch).toHaveBeenCalledWith(
-        `${baseUrl}/api/repos/user1/repo1/registry`,
+        `${baseUrl}/api/repos/user1/repo1/registries`,
         expect.objectContaining({
           method: 'POST',
           body: JSON.stringify(registryData),
@@ -493,7 +493,7 @@ describe('WoodpeckerClient', () => {
       );
 
       expect(mockFetch).toHaveBeenCalledWith(
-        `${baseUrl}/api/repos/user1/repo1/registry/docker.io`,
+        `${baseUrl}/api/repos/user1/repo1/registries/docker.io`,
         expect.objectContaining({
           method: 'PATCH',
           body: JSON.stringify(updateData),
@@ -510,7 +510,7 @@ describe('WoodpeckerClient', () => {
       const result = await client.updateRegistry(123, 'gcr.io', updateData);
 
       expect(mockFetch).toHaveBeenCalledWith(
-        `${baseUrl}/api/repos/123/registry/gcr.io`,
+        `${baseUrl}/api/repos/123/registries/gcr.io`,
         expect.objectContaining({
           method: 'PATCH',
           body: JSON.stringify(updateData),
@@ -532,7 +532,7 @@ describe('WoodpeckerClient', () => {
       );
 
       expect(mockFetch).toHaveBeenCalledWith(
-        `${baseUrl}/api/repos/org/project/registry/ecr.aws`,
+        `${baseUrl}/api/repos/org/project/registries/ecr.aws`,
         expect.objectContaining({
           method: 'PATCH',
           body: JSON.stringify(updateData),
@@ -547,7 +547,7 @@ describe('WoodpeckerClient', () => {
       await client.deleteRegistry('user1', 'repo1', 'docker.io');
 
       expect(mockFetch).toHaveBeenCalledWith(
-        `${baseUrl}/api/repos/user1/repo1/registry/docker.io`,
+        `${baseUrl}/api/repos/user1/repo1/registries/docker.io`,
         expect.objectContaining({ method: 'DELETE' })
       );
     });
@@ -558,7 +558,7 @@ describe('WoodpeckerClient', () => {
       await client.deleteRegistry(456, 'gcr.io');
 
       expect(mockFetch).toHaveBeenCalledWith(
-        `${baseUrl}/api/repos/456/registry/gcr.io`,
+        `${baseUrl}/api/repos/456/registries/gcr.io`,
         expect.objectContaining({ method: 'DELETE' })
       );
     });
@@ -578,7 +578,7 @@ describe('WoodpeckerClient', () => {
       const result = await client.listCrons('user1', 'repo1');
 
       expect(mockFetch).toHaveBeenCalledWith(
-        `${baseUrl}/api/repos/user1/repo1/crons`,
+        `${baseUrl}/api/repos/user1/repo1/cron`,
         expect.objectContaining({ method: 'GET' })
       );
       expect(result).toEqual(mockCrons);
@@ -591,7 +591,7 @@ describe('WoodpeckerClient', () => {
       const result = await client.getCron('user1', 'repo1', 1);
 
       expect(mockFetch).toHaveBeenCalledWith(
-        `${baseUrl}/api/repos/user1/repo1/crons/1`,
+        `${baseUrl}/api/repos/user1/repo1/cron/1`,
         expect.objectContaining({ method: 'GET' })
       );
       expect(result).toEqual(mockCron);
@@ -605,7 +605,7 @@ describe('WoodpeckerClient', () => {
       const result = await client.createCron('user1', 'repo1', cronData);
 
       expect(mockFetch).toHaveBeenCalledWith(
-        `${baseUrl}/api/repos/user1/repo1/crons`,
+        `${baseUrl}/api/repos/user1/repo1/cron`,
         expect.objectContaining({
           method: 'POST',
           body: JSON.stringify(cronData),
@@ -622,7 +622,7 @@ describe('WoodpeckerClient', () => {
       const result = await client.updateCron('user1', 'repo1', 1, updateData);
 
       expect(mockFetch).toHaveBeenCalledWith(
-        `${baseUrl}/api/repos/user1/repo1/crons/1`,
+        `${baseUrl}/api/repos/user1/repo1/cron/1`,
         expect.objectContaining({
           method: 'PATCH',
           body: JSON.stringify(updateData),
@@ -637,7 +637,7 @@ describe('WoodpeckerClient', () => {
       await client.deleteCron('user1', 'repo1', 1);
 
       expect(mockFetch).toHaveBeenCalledWith(
-        `${baseUrl}/api/repos/user1/repo1/crons/1`,
+        `${baseUrl}/api/repos/user1/repo1/cron/1`,
         expect.objectContaining({ method: 'DELETE' })
       );
     });
