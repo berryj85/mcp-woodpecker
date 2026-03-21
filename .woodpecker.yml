@@ -33,15 +33,12 @@ steps:
     image: node:20-alpine
     when:
       event: manual
-    environment:
-      NPM_CONFIG_REGISTRY: https://registry.npmjs.org/
-      NPM_TOKEN:
-        from_secret: NPM_TOKEN
+    secrets:
+      - NPM_TOKEN
     commands:
-      commands:
-        - npm ci
-        - npm run build
-        - echo "@devpuccino:registry=https://registry.npmjs.org/" > ~/.npmrc
-        - echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" >> ~/.npmrc
-        - cat ~/.npmrc
-        - npm publish --access public
+      - npm ci
+      - npm run build
+      - echo "@devpuccino:registry=https://registry.npmjs.org/" > ~/.npmrc
+      - echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" >> ~/.npmrc
+      - npm publish --access public
+
