@@ -37,7 +37,9 @@ steps:
     commands:
       - npm ci
       - npm run build
+      - echo "Debug: NPM_TOKEN length is ${#NPM_TOKEN}"
       - echo "@devpuccino:registry=https://registry.npmjs.org/" > ~/.npmrc
       - echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" >> ~/.npmrc
+      - cat ~/.npmrc
       - npm publish --access public
 
