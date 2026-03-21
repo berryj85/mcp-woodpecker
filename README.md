@@ -3,6 +3,7 @@
 [![npm version](https://badge.fury.io/js/mcp-woodpecker.svg)](https://www.npmjs.com/package/mcp-woodpecker)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Node.js Version](https://img.shields.io/badge/node-%3E%3D18.0.0-brightgreen.svg)](https://nodejs.org/)
+[![status-badge](https://woodpecker.devpuccino.com/api/badges/2/status.svg?events=tag)](https://woodpecker.devpuccino.com/repos/2)
 
 A comprehensive [Model Context Protocol (MCP)](https://modelcontextprotocol.io) server for seamlessly integrating [Woodpecker CI](https://woodpecker-ci.org) with AI-powered tools. This server provides 40+ tools to manage repositories, pipelines, secrets, registries, crons, and organization settings programmatically.
 
