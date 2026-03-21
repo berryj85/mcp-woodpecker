@@ -290,6 +290,15 @@ export class WoodpeckerClient {
     return this.request('POST', `/repos/${repoIdOrOwner}/${dataOrRepo}/registry`, data);
   }
 
+  async updateRegistry(repoId: number, registry: string, data: unknown): Promise<unknown>;
+  async updateRegistry(owner: string, repo: string, registry: string, data: unknown): Promise<unknown>;
+  async updateRegistry(repoIdOrOwner: number | string, registryOrRepo: string, dataOrRegistry?: string | unknown, data?: unknown): Promise<unknown> {
+    if (typeof repoIdOrOwner === 'number') {
+      return this.request('PATCH', `/repos/${repoIdOrOwner}/registry/${registryOrRepo}`, dataOrRegistry);
+    }
+    return this.request('PATCH', `/repos/${repoIdOrOwner}/${registryOrRepo}/registry/${dataOrRegistry}`, data);
+  }
+
   async deleteRegistry(repoId: number, registry: string): Promise<void>;
   async deleteRegistry(owner: string, repo: string, registry: string): Promise<void>;
   async deleteRegistry(repoIdOrOwner: number | string, registryOrRepo: string, registry?: string): Promise<void> {
