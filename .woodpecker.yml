@@ -32,11 +32,12 @@ steps:
   npm-publish:
     image: node:20-alpine
     when:
-      branch: develop
+      branch: master
       event: tag
       ref: refs/tags/v*
-    secrets:
-      - npm_token
+    environment:
+      NPM_TOKEN:
+        from_secret: NPM_TOKEN
     commands:
       - npm ci
       - npm run build
