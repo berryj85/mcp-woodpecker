@@ -8,20 +8,20 @@ steps:
       - npm run build
       - npm test || true
 
-  build-development:
+  build-pr-develop:
     image: node:20-alpine
     when:
       branch: develop
-      event: push
+      event: pull_request
     commands:
       - npm ci
       - npm run build
-      - npm test || true
+      - npm test
 
   build-production:
     image: node:20-alpine
     when:
-      branch: develop
+      branch: master
       event: tag
       ref: refs/tags/v*
     commands:
