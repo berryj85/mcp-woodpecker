@@ -33,6 +33,7 @@ steps:
     image: node:20-alpine
     when:
       event: manual
+    pull_secrets: true
     commands:
       - npm ci
       - npm run build
