@@ -13,7 +13,7 @@ Perfect for automating CI/CD workflows, integrating with Claude AI, or building 
 
 | Component | Version | Notes |
 |-----------|---------|-------|
-| **mcp-woodpecker** | 1.1.1+ | MCP Server implementation |
+| **mcp-woodpecker** | 1.1.2+ | MCP Server implementation |
 | **Woodpecker CI API** | 3.13.0+ | Tested against Woodpecker CI v3.13.0 (January 2026) |
 | **Node.js** | 18.0.0+ | Minimum required version |
 | **MCP SDK** | ^1.27.1 | Model Context Protocol SDK |
@@ -21,6 +21,13 @@ Perfect for automating CI/CD workflows, integrating with Claude AI, or building 
 This server is compatible with Woodpecker CI 3.13.0 and later. The implementation follows the official Woodpecker API specification with support for modern endpoints and features.
 
 ## 📝 Changelog
+
+### v1.1.2 (2026-03-21) - Bugfix Release
+- **Fixed:** `get_server_info` tool removed — `/version` endpoint returns HTML on live deployments
+- **Fixed:** `get_pipeline_logs` now uses correct path `/repos/{id}/logs/{number}/{stepID}` (HTML was from old wrong path)
+- **Fixed:** All org secret tools (`list_org_secrets`, `get_org_secret`, etc.) now use numeric `orgId` instead of org name — resolves 400 Bad Request
+- **Added:** `lookup_organization` tool to resolve org name → numeric ID before secret operations
+- **Tested:** All 47 unit tests passing
 
 ### v1.1.1 (2026-03-21) - Bugfix Release
 - **Fixed:** `cancelPipeline` now calls `POST .../cancel` instead of `DELETE` (which deletes the pipeline permanently)
