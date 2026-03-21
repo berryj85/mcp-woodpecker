@@ -97,7 +97,8 @@ Add to your `.claude/config.json`:
 {
   "servers": {
     "woodpecker": {
-      "command": "mcp-woodpecker",
+      "command": "npx",
+      "args":["-y","mcp-woodpecker"],
       "env": {
         "WOODPECKER_URL": "https://woodpecker.example.com/",
         "WOODPECKER_API_KEY": "your_api_token"
@@ -185,7 +186,6 @@ This project includes a `.woodpecker.yml` configuration that provides:
 
 - Multi-stage Docker builds with registry authentication
 - Separate images for test, dev, and production environments
-- Registry: `192.168.0.200:30095`
 
 ### Deployment Stages
 
