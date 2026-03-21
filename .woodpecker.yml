@@ -1,0 +1,45 @@
+steps:
+  build:
+    image: node:20-alpine
+    when:
+      event: manual
+    commands:
+      - npm ci
+      - npm run build
+      - npm test || true
+
+  build-pr-develop:
+    image: node:20-alpine
+    when:
+      branch: develop
+      event: pull_request
+    commands:
+      - npm ci
+      - npm run build
+      - npm test
+
+  build-production:
+    image: node:20-alpine
+    when:
+      branch: master
+      event: tag
+      ref: refs/tags/v*
+    commands:
+      - npm ci
+      - npm run build
+      - npm test
+
+  npm-publish:
+    image: node:20-alpine
+    when:
+      branch: master
+      event: tag
+      ref: refs/tags/v*
+    environment:
+      NPM_TOKEN:
+        from_secret: NPM_TOKEN
+    commands:
+      - npm ci
+      - npm run build
+      - echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc
+      - npm publish --access public
