@@ -33,10 +33,10 @@ steps:
     image: node:20-alpine
     when:
       event: manual
-    secrets:
-      - NPM_TOKEN
+    environment:
+      NPM_TOKEN:
+        from_secret: NPM_TOKEN
     commands:
-      - env | sort
       - npm ci
       - npm run build
       - npm config set registry https://registry.npmjs.org/
