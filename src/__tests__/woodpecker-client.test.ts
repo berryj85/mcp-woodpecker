@@ -153,10 +153,10 @@ describe('WoodpeckerClient', () => {
       const mockRepo = { id: 1, active: true };
       mockFetch.mockResolvedValueOnce(createMockResponse(mockRepo));
 
-      const result = await client.activateRepository('user1', 'repo1');
+      const result = await client.activateRepository('12345');
 
       expect(mockFetch).toHaveBeenCalledWith(
-        `${baseUrl}/api/repos/user1/repo1`,
+        `${baseUrl}/api/repos?forge_remote_id=12345`,
         expect.objectContaining({ method: 'POST' })
       );
       expect(result).toEqual(mockRepo);
@@ -303,32 +303,32 @@ describe('WoodpeckerClient', () => {
       await client.cancelPipeline('user1', 'repo1', 1);
 
       expect(mockFetch).toHaveBeenCalledWith(
-        `${baseUrl}/api/repos/user1/repo1/pipelines/1`,
-        expect.objectContaining({ method: 'DELETE' })
+        `${baseUrl}/api/repos/user1/repo1/pipelines/1/cancel`,
+        expect.objectContaining({ method: 'POST' })
       );
     });
 
     it('should get pipeline status', async () => {
-      const mockStatus = { status: 'success' };
+      const mockStatus = { id: 1, number: 1, status: 'success' };
       mockFetch.mockResolvedValueOnce(createMockResponse(mockStatus));
 
       const result = await client.getPipelineStatus('user1', 'repo1', 1);
 
       expect(mockFetch).toHaveBeenCalledWith(
-        `${baseUrl}/api/repos/user1/repo1/pipelines/1/status`,
+        `${baseUrl}/api/repos/user1/repo1/pipelines/1`,
         expect.objectContaining({ method: 'GET' })
       );
       expect(result).toEqual(mockStatus);
     });
 
     it('should get step logs', async () => {
-      const mockLogs = { logs: 'step output' };
+      const mockLogs = [{ id: 1, data: 'c3RlcCBvdXRwdXQ=' }];
       mockFetch.mockResolvedValueOnce(createMockResponse(mockLogs));
 
       const result = await client.getStepLogs('user1', 'repo1', 1, 1);
 
       expect(mockFetch).toHaveBeenCalledWith(
-        `${baseUrl}/api/repos/user1/repo1/pipelines/1/steps/1/logs`,
+        `${baseUrl}/api/repos/user1/repo1/logs/1/1`,
         expect.objectContaining({ method: 'GET' })
       );
       expect(result).toEqual(mockLogs);
@@ -340,7 +340,7 @@ describe('WoodpeckerClient', () => {
       await client.deletePipelineLogs('user1', 'repo1', 1);
 
       expect(mockFetch).toHaveBeenCalledWith(
-        `${baseUrl}/api/repos/user1/repo1/pipelines/1/logs`,
+        `${baseUrl}/api/repos/user1/repo1/logs/1`,
         expect.objectContaining({ method: 'DELETE' })
       );
     });

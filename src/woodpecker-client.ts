@@ -75,13 +75,8 @@ export class WoodpeckerClient {
     return this.request('GET', `/repos/${repoIdOrOwner}/${repo}`);
   }
 
-  async activateRepository(repoId: number): Promise<unknown>;
-  async activateRepository(owner: string, repo: string): Promise<unknown>;
-  async activateRepository(repoIdOrOwner: number | string, repo?: string): Promise<unknown> {
-    if (typeof repoIdOrOwner === 'number') {
-      return this.request('POST', `/repos/${repoIdOrOwner}`);
-    }
-    return this.request('POST', `/repos/${repoIdOrOwner}/${repo}`, {});
+  async activateRepository(forgeRemoteId: string): Promise<unknown> {
+    return this.request('POST', `/repos?forge_remote_id=${encodeURIComponent(forgeRemoteId)}`);
   }
 
   async updateRepository(repoId: number, data: unknown): Promise<unknown>;
@@ -163,18 +158,18 @@ export class WoodpeckerClient {
   async cancelPipeline(owner: string, repo: string, number: number): Promise<void>;
   async cancelPipeline(repoIdOrOwner: number | string, numberOrRepo: number | string, number?: number): Promise<void> {
     if (typeof repoIdOrOwner === 'number') {
-      return this.request('DELETE', `/repos/${repoIdOrOwner}/pipelines/${numberOrRepo}`);
+      return this.request('POST', `/repos/${repoIdOrOwner}/pipelines/${numberOrRepo}/cancel`, {});
     }
-    return this.request('DELETE', `/repos/${repoIdOrOwner}/${numberOrRepo}/pipelines/${number}`);
+    return this.request('POST', `/repos/${repoIdOrOwner}/${numberOrRepo}/pipelines/${number}/cancel`, {});
   }
 
   async getPipelineStatus(repoId: number, number: number): Promise<unknown>;
   async getPipelineStatus(owner: string, repo: string, number: number): Promise<unknown>;
   async getPipelineStatus(repoIdOrOwner: number | string, numberOrRepo: number | string, number?: number): Promise<unknown> {
     if (typeof repoIdOrOwner === 'number') {
-      return this.request('GET', `/repos/${repoIdOrOwner}/pipelines/${numberOrRepo}/status`);
+      return this.request('GET', `/repos/${repoIdOrOwner}/pipelines/${numberOrRepo}`);
     }
-    return this.request('GET', `/repos/${repoIdOrOwner}/${numberOrRepo}/pipelines/${number}/status`);
+    return this.request('GET', `/repos/${repoIdOrOwner}/${numberOrRepo}/pipelines/${number}`);
   }
 
   // Step/Build logs
@@ -182,24 +177,18 @@ export class WoodpeckerClient {
   async getStepLogs(owner: string, repo: string, number: number, step: number): Promise<unknown>;
   async getStepLogs(repoIdOrOwner: number | string, numberOrRepo: number | string, stepOrNumber: number, step?: number): Promise<unknown> {
     if (typeof repoIdOrOwner === 'number') {
-      return this.request(
-        'GET',
-        `/repos/${repoIdOrOwner}/pipelines/${numberOrRepo}/steps/${stepOrNumber}/logs`
-      );
+      return this.request('GET', `/repos/${repoIdOrOwner}/logs/${numberOrRepo}/${stepOrNumber}`);
     }
-    return this.request(
-      'GET',
-      `/repos/${repoIdOrOwner}/${numberOrRepo}/pipelines/${stepOrNumber}/steps/${step}/logs`
-    );
+    return this.request('GET', `/repos/${repoIdOrOwner}/${numberOrRepo}/logs/${stepOrNumber}/${step}`);
   }
 
   async deletePipelineLogs(repoId: number, number: number): Promise<void>;
   async deletePipelineLogs(owner: string, repo: string, number: number): Promise<void>;
   async deletePipelineLogs(repoIdOrOwner: number | string, numberOrRepo: number | string, number?: number): Promise<void> {
     if (typeof repoIdOrOwner === 'number') {
-      return this.request('DELETE', `/repos/${repoIdOrOwner}/pipelines/${numberOrRepo}/logs`);
+      return this.request('DELETE', `/repos/${repoIdOrOwner}/logs/${numberOrRepo}`);
     }
-    return this.request('DELETE', `/repos/${repoIdOrOwner}/${numberOrRepo}/pipelines/${number}/logs`);
+    return this.request('DELETE', `/repos/${repoIdOrOwner}/${numberOrRepo}/logs/${number}`);
   }
 
   // Secrets endpoints

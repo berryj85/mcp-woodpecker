@@ -23,10 +23,13 @@ This server is compatible with Woodpecker CI 3.13.0 and later. The implementatio
 ## 📝 Changelog
 
 ### v1.1.1 (2026-03-21) - Bugfix Release
-- **Fixed:** API endpoint paths for registry operations (`/registry` → `/registries`)
-- **Fixed:** API endpoint paths for cron operations (`/crons` → `/cron`)
-- **Fixed:** All paths now match Woodpecker CI API v3.13.0 specification
-- **Tested:** All 47 unit tests passing
+- **Fixed:** `cancelPipeline` now calls `POST .../cancel` instead of `DELETE` (which deletes the pipeline permanently)
+- **Fixed:** `getPipelineStatus` now maps to `GET /repos/{id}/pipelines/{number}` — no separate `/status` endpoint exists in the API
+- **Fixed:** `getStepLogs` path corrected to `/repos/{id}/logs/{number}/{stepID}` per API spec
+- **Fixed:** `deletePipelineLogs` path corrected to `/repos/{id}/logs/{number}` per API spec
+- **Fixed:** `activateRepository` now uses `POST /repos?forge_remote_id=...` (query param, not path param)
+- **Fixed:** Cron create/update now sends `schedule` field instead of `expr` to match API schema
+- **Tested:** All 47 unit tests updated and passing
 
 ### v1.1.0 (2026-03-21)
 - **Added:** `updateRegistry()` method for updating registry credentials

@@ -68,16 +68,16 @@ const tools: Tool[] = [
   },
   {
     name: 'activate_repository',
-    description: 'Activate a repository in Woodpecker',
+    description: 'Activate a repository in Woodpecker using the forge remote ID',
     inputSchema: {
       type: 'object',
       properties: {
-        repoId: {
-          type: 'number',
-          description: 'Repository ID',
+        forgeRemoteId: {
+          type: 'string',
+          description: 'The repository ID at the forge (e.g. GitHub repository ID)',
         },
       },
-      required: ['repoId'],
+      required: ['forgeRemoteId'],
     },
   },
   {
@@ -695,7 +695,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
     } else if (toolName === 'get_repository') {
       result = await client.getRepository(toolInput.repoId as number);
     } else if (toolName === 'activate_repository') {
-      result = await client.activateRepository(toolInput.repoId as number);
+      result = await client.activateRepository(toolInput.forgeRemoteId as string);
     } else if (toolName === 'update_repository') {
       const data: Record<string, unknown> = {};
       if (toolInput.is_trusted !== undefined)
@@ -813,13 +813,13 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
     } else if (toolName === 'create_cron') {
       result = await client.createCron(toolInput.repoId as number, {
         name: toolInput.name,
-        expr: toolInput.expr,
+        schedule: toolInput.expr,
         branch: toolInput.branch,
       });
     } else if (toolName === 'update_cron') {
       const cronData: Record<string, unknown> = {};
       if (toolInput.name !== undefined) cronData.name = toolInput.name;
-      if (toolInput.expr !== undefined) cronData.expr = toolInput.expr;
+      if (toolInput.expr !== undefined) cronData.schedule = toolInput.expr;
       if (toolInput.branch !== undefined) cronData.branch = toolInput.branch;
       result = await client.updateCron(
         toolInput.repoId as number,
