@@ -23,7 +23,7 @@ steps:
     when:
       branch: master
       event: tag
-      ref: refs/tags/v*
+      ref: 'refs/tags/v*'
     commands:
       - npm ci
       - npm run build
@@ -41,5 +41,7 @@ steps:
     commands:
       - npm ci
       - npm run build
-      - echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc
+      - npm config set registry https://registry.npmjs.org/
+      - sh -c 'npm config set //registry.npmjs.org/:_authToken $NPM_TOKEN'
       - npm publish --access public
+
