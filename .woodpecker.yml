@@ -32,9 +32,7 @@ steps:
   npm-publish:
     image: node:20-alpine
     when:
-      branch: master
       event: manual
-      ref: refs/tags/v*
     environment:
       NPM_TOKEN:
         from_secret: NPM_TOKEN
