@@ -13,7 +13,7 @@ Perfect for automating CI/CD workflows, integrating with Claude AI, or building 
 
 | Component | Version | Notes |
 |-----------|---------|-------|
-| **mcp-woodpecker** | 1.1.1+ | MCP Server implementation |
+| **mcp-woodpecker** | 1.1.2+ | MCP Server implementation |
 | **Woodpecker CI API** | 3.13.0+ | Tested against Woodpecker CI v3.13.0 (January 2026) |
 | **Node.js** | 18.0.0+ | Minimum required version |
 | **MCP SDK** | ^1.27.1 | Model Context Protocol SDK |
@@ -22,11 +22,24 @@ This server is compatible with Woodpecker CI 3.13.0 and later. The implementatio
 
 ## 📝 Changelog
 
-### v1.1.1 (2026-03-21) - Bugfix Release
-- **Fixed:** API endpoint paths for registry operations (`/registry` → `/registries`)
-- **Fixed:** API endpoint paths for cron operations (`/crons` → `/cron`)
-- **Fixed:** All paths now match Woodpecker CI API v3.13.0 specification
+### v1.1.2 (2026-03-21) - Bugfix Release
+- **Fixed:** `get_server_info` tool removed — `/version` endpoint returns HTML on live deployments
+- **Fixed:** `get_pipeline_logs` now uses correct path `/repos/{id}/logs/{number}/{stepID}` (HTML was from old wrong path)
+- **Fixed:** All org secret tools (`list_org_secrets`, `get_org_secret`, etc.) now use numeric `orgId` instead of org name — resolves 400 Bad Request
+- **Added:** `lookup_organization` tool to resolve org name → numeric ID before secret operations
 - **Tested:** All 47 unit tests passing
+
+### v1.1.1 (2026-03-21) - Bugfix Release
+- **Fixed:** `cancelPipeline` now calls `POST .../cancel` instead of `DELETE` (which deletes the pipeline permanently)
+- **Fixed:** `getPipelineStatus` now maps to `GET /repos/{id}/pipelines/{number}` — no separate `/status` endpoint exists in the API
+- **Fixed:** `getStepLogs` path corrected to `/repos/{id}/logs/{number}/{stepID}` per API spec
+- **Fixed:** `deletePipelineLogs` path corrected to `/repos/{id}/logs/{number}` per API spec
+- **Fixed:** `activateRepository` now uses `POST /repos?forge_remote_id=...` (query param, not path param)
+- **Fixed:** Cron create/update now sends `schedule` field instead of `expr` to match API schema
+- **Fixed:** `list_org_secrets` and all org secret tools now require numeric `orgId` (not org name) — matches `GET /orgs/{org_id}/secrets` API spec
+- **Added:** `lookup_organization` tool — resolves org name → numeric ID via `GET /orgs/lookup/{org_full_name}`
+- **Removed:** `get_server_info` tool — `/version` endpoint returns HTML on this deployment (no reliable alternative)
+- **Tested:** All 47 unit tests updated and passing
 
 ### v1.1.0 (2026-03-21)
 - **Added:** `updateRegistry()` method for updating registry credentials
